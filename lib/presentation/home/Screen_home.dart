@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netflix_clone/application/home/home_bloc.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
+import 'dart:ui';
 import 'package:netflix_clone/presentation/home/widget/background_card.dart';
 import 'package:netflix_clone/presentation/widget/main_title_card.dart';
 import 'package:netflix_clone/presentation/category/screen_category_movies.dart';
+import 'package:netflix_clone/presentation/search/screen_search.dart';
 
 // ignore: must_be_immutable
 class ScreenHome extends StatelessWidget {
@@ -187,67 +189,94 @@ class ScreenHome extends StatelessWidget {
                     top: isScrollingUp ? 0 : -110,
                     left: 0,
                     right: 0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.black.withOpacity(0.85),
-                            Colors.black.withOpacity(0.4),
-                            Colors.transparent,
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                      ),
-                      child: SafeArea(
-                        bottom: false,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                children: [
-                                  Image.network(
-                                    'https://cdn-images-1.medium.com/max/1200/1*ty4NvNrGg4ReETxqU2N3Og.png',
-                                    width: 40,
-                                    height: 40,
-                                    errorBuilder: (ctx, err, stack) =>
-                                        const Text(
-                                      "NETFLIX",
-                                      style: TextStyle(
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  const Icon(
-                                    Icons.cast,
-                                    size: 26,
-                                    color: kwhiteColor,
-                                  ),
-                                  kWidth,
-                                  Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red[700],
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        "N",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    child: ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withOpacity(0.95),
+                                Colors.black.withOpacity(0.88),
+                                Colors.black.withOpacity(0.68),
+                                Colors.black.withOpacity(0.25),
+                                Colors.transparent,
+                              ],
+                              stops: const [0.0, 0.45, 0.75, 0.92, 1.0],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
                             ),
+                          ),
+                          child: SafeArea(
+                            bottom: false,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Row(
+                                    children: [
+                                      Image.network(
+                                        'https://cdn-images-1.medium.com/max/1200/1*ty4NvNrGg4ReETxqU2N3Og.png',
+                                        width: 40,
+                                        height: 40,
+                                        errorBuilder: (ctx, err, stack) =>
+                                            const Text(
+                                          "NETFLIX",
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => const ScreenSearch(),
+                                            ),
+                                          );
+                                        },
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 8),
+                                          child: Icon(
+                                            Icons.search,
+                                            size: 28,
+                                            color: kwhiteColor,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 14),
+                                      const Icon(
+                                        Icons.cast,
+                                        size: 25,
+                                        color: kwhiteColor,
+                                      ),
+                                      const SizedBox(width: 14),
+                                      Container(
+                                        width: 28,
+                                        height: 28,
+                                        decoration: BoxDecoration(
+                                          color: Colors.red[700],
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            "N",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                             const SizedBox(height: 6),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
@@ -358,6 +387,8 @@ class ScreenHome extends StatelessWidget {
                       ),
                     ),
                   ),
+                ),
+              ),
                 ],
               ),
             ),

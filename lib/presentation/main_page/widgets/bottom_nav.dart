@@ -22,15 +22,11 @@ class BottomNaviagtionWidget extends StatelessWidget {
             selectedIconTheme: const IconThemeData(color: Colors.white),
             unselectedIconTheme: const IconThemeData(color: Colors.grey),
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.collections), label: 'New & Hot'),
+                  icon: Icon(Icons.collections), label: 'Mới & Hot'),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.emoji_emotions), label: 'Fast Lanug'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.search), label: 'Search'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.download), label: 'Downloads')
+                  icon: Icon(Icons.download), label: 'Tải xuống'),
             ]);
       },
     );
