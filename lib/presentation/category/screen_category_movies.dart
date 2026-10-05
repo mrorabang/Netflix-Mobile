@@ -34,10 +34,40 @@ const Map<String, String> theLoaiNames = {
   'mien-tay': 'Miền Tây',
 };
 
+const Map<String, String> quocGiaNames = {
+  'trung-quoc': 'Trung Quốc',
+  'han-quoc': 'Hàn Quốc',
+  'nhat-ban': 'Nhật Bản',
+  'thai-lan': 'Thái Lan',
+  'au-my': 'Âu Mỹ',
+  'dai-loan': 'Đài Loan',
+  'hong-kong': 'Hồng Kông',
+  'an-do': 'Ấn Độ',
+  'anh': 'Anh',
+  'phap': 'Pháp',
+  'can-da': 'Canada',
+  'duc': 'Đức',
+  'tay-ban-nha': 'Tây Ban Nha',
+  'tho-nhi-ky': 'Thổ Nhĩ Kỳ',
+  'ha-lan': 'Hà Lan',
+  'indonesia': 'Indonesia',
+  'nga': 'Nga',
+  'mexico': 'Mexico',
+  'ba-lan': 'Ba Lan',
+  'uc': 'Úc',
+  'thuy-dien': 'Thụy Điển',
+  'malaysia': 'Malaysia',
+  'brazil': 'Brazil',
+  'philippines': 'Philippines',
+  'viet-nam': 'Việt Nam',
+  'quoc-gia-khac': 'Quốc Gia Khác',
+};
+
 enum CategoryType {
   phimBo,
   phimLe,
   theLoai,
+  quocGia,
 }
 
 class CategoryMovieItem {
@@ -111,7 +141,8 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
   void initState() {
     super.initState();
     _currentType = widget.type;
-    _currentSlug = widget.initialSlug ?? 'hanh-dong';
+    _currentSlug = widget.initialSlug ??
+        (widget.type == CategoryType.quocGia ? 'han-quoc' : 'hanh-dong');
     _title = widget.initialTitle;
 
     _scrollController.addListener(_onScroll);
@@ -141,6 +172,8 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
         return 'https://phimapi.com/v1/api/danh-sach/phim-le?page=$page&limit=28';
       case CategoryType.theLoai:
         return 'https://phimapi.com/v1/api/the-loai/$_currentSlug?page=$page&limit=28';
+      case CategoryType.quocGia:
+        return 'https://phimapi.com/v1/api/quoc-gia/$_currentSlug?page=$page&limit=28';
     }
   }
 
@@ -152,6 +185,8 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
         return '$kBaseUrl/api/danh-sach/phim-le?page=$page&limit=28';
       case CategoryType.theLoai:
         return '$kBaseUrl/api/the-loai/$_currentSlug?page=$page&limit=28';
+      case CategoryType.quocGia:
+        return '$kBaseUrl/api/quoc-gia/$_currentSlug?page=$page&limit=28';
     }
   }
 
@@ -253,7 +288,16 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
     }
     setState(() {
       _currentType = newType;
-      if (slug != null) _currentSlug = slug;
+      if (slug != null) {
+        _currentSlug = slug;
+      } else {
+        if (newType == CategoryType.theLoai && !theLoaiNames.containsKey(_currentSlug)) {
+          _currentSlug = 'hanh-dong';
+        } else if (newType == CategoryType.quocGia && !quocGiaNames.containsKey(_currentSlug)) {
+          _currentSlug = 'han-quoc';
+        }
+      }
+
       if (title != null) {
         _title = title;
       } else {
@@ -266,6 +310,9 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
             break;
           case CategoryType.theLoai:
             _title = theLoaiNames[_currentSlug] ?? "Thể Loại";
+            break;
+          case CategoryType.quocGia:
+            _title = "Phim ${quocGiaNames[_currentSlug] ?? 'Quốc Gia'}";
             break;
         }
       }
@@ -372,6 +419,22 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
                     );
                   },
                 ),
+                const SizedBox(width: 8),
+                _buildTypeChip(
+                  label: _currentType == CategoryType.quocGia
+                      ? "Quốc gia: ${quocGiaNames[_currentSlug] ?? 'Chọn'}"
+                      : "Quốc Gia ▾",
+                  isSelected: _currentType == CategoryType.quocGia,
+                  onTap: () {
+                    showQuocGiaBottomSheet(
+                      context,
+                      currentSlug: _currentSlug,
+                      onSelected: (slug, name) {
+                        _switchType(CategoryType.quocGia, slug: slug, title: "Phim $name");
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -395,6 +458,50 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
                           CategoryType.theLoai,
                           slug: entry.key,
                           title: entry.value,
+                        );
+                      },
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? Colors.black : Colors.white70,
+                      ),
+                      selectedColor: Colors.white,
+                      backgroundColor: Colors.grey[900],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(
+                          color: isSelected ? Colors.white : Colors.white24,
+                          width: 0.8,
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+          // If country mode is active, display horizontal scrollable country quick-pick chips
+          if (_currentType == CategoryType.quocGia) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 32,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                children: quocGiaNames.entries.map((entry) {
+                  final isSelected = entry.key == _currentSlug;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ChoiceChip(
+                      label: Text(entry.value),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        _switchType(
+                          CategoryType.quocGia,
+                          slug: entry.key,
+                          title: "Phim ${entry.value}",
                         );
                       },
                       labelStyle: TextStyle(
@@ -820,6 +927,134 @@ void showTheLoaiBottomSheet(
                             builder: (_) => ScreenCategoryMovies(
                               initialTitle: name,
                               type: CategoryType.theLoai,
+                              initialSlug: slug,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.red[800]
+                            : const Color(0xFF222222),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isSelected ? Colors.red : Colors.white12,
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.5,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+void showQuocGiaBottomSheet(
+  BuildContext context, {
+  String? currentSlug,
+  void Function(String slug, String name)? onSelected,
+}) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (ctx) {
+      return Container(
+        height: MediaQuery.of(ctx).size.height * 0.72,
+        decoration: const BoxDecoration(
+          color: Color(0xFF141414),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // Drag handle
+            Container(
+              margin: const EdgeInsets.only(top: 10, bottom: 8),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[600],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Text(
+                    "Chọn Quốc Gia",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 19,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[850],
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close,
+                          color: Colors.white, size: 18),
+                    ),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(color: Colors.white12, height: 1),
+            // Grid of Countries
+            Expanded(
+              child: GridView.builder(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 2.8,
+                ),
+                itemCount: quocGiaNames.length,
+                itemBuilder: (context, index) {
+                  final entry = quocGiaNames.entries.elementAt(index);
+                  final slug = entry.key;
+                  final name = entry.value;
+                  final isSelected = slug == currentSlug;
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      if (onSelected != null) {
+                        onSelected(slug, name);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ScreenCategoryMovies(
+                              initialTitle: "Phim $name",
+                              type: CategoryType.quocGia,
                               initialSlug: slug,
                             ),
                           ),

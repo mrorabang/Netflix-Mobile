@@ -249,80 +249,108 @@ class ScreenHome extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
-                              children: [
-                                GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const ScreenCategoryMovies(
-                                          initialTitle: "Phim Bộ",
-                                          type: CategoryType.phimBo,
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const ScreenCategoryMovies(
+                                            initialTitle: "Phim Bộ",
+                                            type: CategoryType.phimBo,
+                                          ),
                                         ),
+                                      );
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      child: Text(
+                                        "Phim Bộ",
+                                        style: kHomeTitleText,
                                       ),
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 6),
-                                    child: const Text(
-                                      "Phim Bộ",
-                                      style: kHomeTitleText,
                                     ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const ScreenCategoryMovies(
-                                          initialTitle: "Phim Lẻ",
-                                          type: CategoryType.phimLe,
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const ScreenCategoryMovies(
+                                            initialTitle: "Phim Lẻ",
+                                            type: CategoryType.phimLe,
+                                          ),
                                         ),
+                                      );
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      child: Text(
+                                        "Phim Lẻ",
+                                        style: kHomeTitleText,
                                       ),
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 6),
-                                    child: const Text(
-                                      "Phim Lẻ",
-                                      style: kHomeTitleText,
                                     ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () {
-                                    showTheLoaiBottomSheet(context);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 6),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: const [
-                                        Text(
-                                          "Thể Loại",
-                                          style: kHomeTitleText,
-                                        ),
-                                        SizedBox(width: 3),
-                                        Icon(
-                                          Icons.arrow_drop_down,
-                                          color: Colors.white,
-                                          size: 18,
-                                        ),
-                                      ],
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      showTheLoaiBottomSheet(context);
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 6),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            "Thể Loại",
+                                            style: kHomeTitleText,
+                                          ),
+                                          SizedBox(width: 2),
+                                          Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      showQuocGiaBottomSheet(context);
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 6),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            "Quốc Gia",
+                                            style: kHomeTitleText,
+                                          ),
+                                          SizedBox(width: 2),
+                                          Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 10),
                           ],

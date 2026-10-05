@@ -59,28 +59,20 @@ class ScreenDescription extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                const RoundText(
-                                  text: "18+",
-                                ),
-                                kWidth,
-                                RoundText(
-                                    text: state.status.isEmpty ? "HD" : state.status),
-                                kWidth,
-                                RoundText(text: "⭐ ${state.voteAverage}"),
-                              ],
-                            ),
-                          ),
+                        const RoundText(
+                          text: "18+",
                         ),
+                        kWidth,
+                        RoundText(
+                            text: state.status.isEmpty ? "HD" : state.status),
+                        kWidth,
+                        RoundText(text: "⭐ ${state.voteAverage}"),
+                        const Spacer(),
                         IconButton(
                             onPressed: () {},
                             icon: const Icon(
                               Icons.add_circle_outline_sharp,
-                              size: 28,
+                              size: 30,
                               color: kwhiteColor,
                             )),
                         IconButton(
@@ -88,7 +80,7 @@ class ScreenDescription extends StatelessWidget {
                             icon: const Icon(
                               Icons.share,
                               color: kwhiteColor,
-                              size: 28,
+                              size: 30,
                             ))
                       ],
                     ),
