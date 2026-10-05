@@ -59,28 +59,40 @@ class ScreenDescription extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        const RoundText(
-                          text: "18+",
+                        Expanded(
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              const RoundText(
+                                text: "18+",
+                              ),
+                              RoundText(
+                                  text: state.status.isEmpty ? "HD" : state.status),
+                              if (state.voteAverage > 0)
+                                RoundText(text: "⭐ ${state.voteAverage}"),
+                            ],
+                          ),
                         ),
-                        kWidth,
-                        RoundText(
-                            text: state.status.isEmpty ? "HD" : state.status),
-                        kWidth,
-                        RoundText(text: "⭐ ${state.voteAverage}"),
-                        const Spacer(),
                         IconButton(
                             onPressed: () {},
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                             icon: const Icon(
                               Icons.add_circle_outline_sharp,
-                              size: 30,
+                              size: 28,
                               color: kwhiteColor,
                             )),
+                        const SizedBox(width: 12),
                         IconButton(
                             onPressed: () {},
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                             icon: const Icon(
                               Icons.share,
                               color: kwhiteColor,
-                              size: 30,
+                              size: 26,
                             ))
                       ],
                     ),
