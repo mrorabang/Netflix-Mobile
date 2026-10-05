@@ -4,6 +4,7 @@ import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
 
 import '../../application/hot_and_new/hot_and_new_bloc.dart';
+import '../search/screen_search.dart';
 import 'widget/coming_soon_widget.dart';
 import 'widget/everyones_watching_widget.dart';
 
@@ -31,6 +32,24 @@ class ScreenNewAndHot extends StatelessWidget {
               ),
             ),
             actions: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(
+                  Icons.search,
+                  size: 26,
+                  color: kwhiteColor,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ScreenSearch(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(width: 14),
               const Icon(
                 Icons.cast,
                 size: 24,
