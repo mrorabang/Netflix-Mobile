@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Netflix',
+        title: 'Nét Lích',
         theme: ThemeData(
             appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
             primarySwatch: Colors.blue,

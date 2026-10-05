@@ -2,7 +2,7 @@
     package="com.example.netflix_clone">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="netflix_clone"
+        android:label="Nét Lích"
         android:name="${applicationName}"
         android:networkSecurityConfig="@xml/network_security_config"
         android:icon="@mipmap/ic_launcher">
