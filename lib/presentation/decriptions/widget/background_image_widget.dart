@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../core/colors/colors.dart';
 
 class BackgroundImage extends StatelessWidget {
@@ -12,38 +11,61 @@ class BackgroundImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      foregroundDecoration: const BoxDecoration(
-          gradient: LinearGradient(
-              colors: [
-                Colors.black,
-                Colors.transparent,
-                Colors.transparent,
-                Colors.black
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0, 0, 0.8, 1])),
+    return SizedBox(
+      height: 480,
+      width: double.infinity,
       child: Stack(
         children: [
-          Image(
-            height: 480,
-            width: double.infinity,
-            image: NetworkImage(imageUrl),
-            fit: BoxFit.cover,
-            errorBuilder: (BuildContext ctx, Object expection,
-                StackTrace? stackTrace) {
-              return const Text("error");
-            },
+          Positioned.fill(
+            child: Image(
+              image: NetworkImage(imageUrl),
+              fit: BoxFit.cover,
+              errorBuilder: (BuildContext ctx, Object exception,
+                  StackTrace? stackTrace) {
+                return Container(
+                  color: Colors.grey[900],
+                  child: const Center(
+                    child: Icon(Icons.movie, size: 60, color: Colors.grey),
+                  ),
+                );
+              },
+            ),
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              size: 30,
-              color: kwhiteColor,
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black54,
+                    Colors.transparent,
+                    Colors.transparent,
+                    Colors.black,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0, 0.2, 0.7, 1],
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, top: 4),
+              child: CircleAvatar(
+                backgroundColor: Colors.black45,
+                radius: 20,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    size: 24,
+                    color: kwhiteColor,
+                  ),
+                ),
+              ),
             ),
           ),
         ],

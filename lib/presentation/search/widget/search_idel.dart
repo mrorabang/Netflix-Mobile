@@ -16,7 +16,7 @@ class SearchIdelWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SearchTitleText(
-          title: "Top Seraches",
+          title: "Tìm Kiếm Hàng Đầu",
         ),
         kHeight20,
         Expanded(
@@ -25,18 +25,18 @@ class SearchIdelWidget extends StatelessWidget {
               if (state.isLoading) {
                 return const Center(child: CircularProgressIndicator());
               } else if (state.isError) {
-                return const Center(child: Text("Error while getting data"));
+                return const Center(child: Text("Lỗi khi tải dữ liệu"));
               } else if (state.ideleList.isEmpty) {
-                return const Center(child: Text("List is empty"));
+                return const Center(child: Text("Danh sách trống"));
               }
               return ListView.separated(
                 shrinkWrap: true,
                 itemBuilder: (ctx, index) {
                   final movie = state.ideleList[index];
                   return TopSearchItemTile(
-                    id: movie.id!,
-                    title: movie.title ?? 'No title provider',
-                    imageUrl: '$imageAppendUrl${movie.posterPath}',
+                    id: movie.id ?? '',
+                    title: movie.title ?? 'Chưa có tiêu đề',
+                    imageUrl: resolveImageUrl(movie.posterPath, null),
                   );
                 },
                 separatorBuilder: (ctx, index) => kHeight20,
@@ -58,52 +58,67 @@ class TopSearchItemTile extends StatelessWidget {
     required this.id,
   }) : super(key: key);
 
-  final int id;
+  final String id;
   final String title;
   final String imageUrl;
 
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (ctx) => ScreenDescription(id: id),
+    return InkWell(
+      onTap: () {
+        if (id.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (ctx) => ScreenDescription(id: id),
+            ),
+          );
+        }
+      },
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Container(
+              width: screenwidth * 0.35,
+              height: 72,
+              color: Colors.grey[900],
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (ctx, err, stack) => Container(
+                  color: Colors.grey[900],
+                  child: const Icon(Icons.movie, color: Colors.grey),
+                ),
               ),
-            );
-          },
-          child: Container(
-            width: screenwidth * 0.35,
-            height: 65,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                image: DecorationImage(
-                    image: NetworkImage(imageUrl), fit: BoxFit.cover)),
-          ),
-        ),
-        kWidth,
-        Expanded(
-            child: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        )),
-        const CircleAvatar(
-          backgroundColor: kwhiteColor,
-          radius: 25,
-          child: CircleAvatar(
-            backgroundColor: kBlackColor,
-            radius: 23,
-            child: Icon(
-              CupertinoIcons.play_fill,
-              color: kwhiteColor,
             ),
           ),
-        )
-      ],
+          kWidth,
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+          ),
+          kWidth,
+          const CircleAvatar(
+            backgroundColor: kwhiteColor,
+            radius: 20,
+            child: CircleAvatar(
+              backgroundColor: kBlackColor,
+              radius: 18,
+              child: Icon(
+                CupertinoIcons.play_fill,
+                color: kwhiteColor,
+                size: 18,
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

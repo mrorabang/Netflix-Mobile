@@ -8,7 +8,7 @@ part of 'discover.dart';
 
 HotAndNewDataResp _$HotAndNewDataRespFromJson(Map<String, dynamic> json) =>
     HotAndNewDataResp(
-      page: json['page'] as int?,
+      page: (json['page'] as num?)?.toInt(),
       results: (json['results'] as List<dynamic>?)
               ?.map((e) => HotAndNewData.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -25,7 +25,7 @@ HotAndNewData _$HotAndNewDataFromJson(Map<String, dynamic> json) =>
     HotAndNewData(
       adult: json['adult'] as bool?,
       backdropPath: json['backdrop_path'] as String?,
-      id: json['id'] as int?,
+      id: json['id'] as String?,
       originalLanguage: json['original_language'] as String?,
       originalTitle: json['original_title'] as String?,
       overview: json['overview'] as String?,

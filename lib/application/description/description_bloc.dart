@@ -20,7 +20,7 @@ class DescriptionBloc extends Bloc<DescriptionEvent, DescriptionState> {
       : super(DescriptionState.initial()) {
     on<LoadDataMovie>((event, emit) async {
       emit(
-         const DescriptionState(
+        const DescriptionState(
           title: "",
           posterPath: "",
           overview: "",
@@ -29,6 +29,7 @@ class DescriptionBloc extends Bloc<DescriptionEvent, DescriptionState> {
           voteAverage: 0,
           isLoading: true,
           isError: false,
+          episodeList: [],
         ),
       );
       final movies =
@@ -41,18 +42,20 @@ class DescriptionBloc extends Bloc<DescriptionEvent, DescriptionState> {
           status: "",
           relaseDate: "",
           voteAverage: 0,
-          isLoading: true,
-          isError: false,
+          isLoading: false,
+          isError: true,
+          episodeList: [],
         ),
         (r) => DescriptionState(
-          title: r.title!,
-          posterPath: r.posterPath!,
-          overview: r.overview!,
-          status: r.status!,
-          relaseDate: r.releaseDate!,
-          voteAverage: r.voteAverage!,
+          title: r.title ?? '',
+          posterPath: r.posterPath ?? '',
+          overview: r.overview ?? '',
+          status: r.status ?? '',
+          relaseDate: r.releaseDate ?? '',
+          voteAverage: r.voteAverage ?? 0,
           isLoading: false,
           isError: false,
+          episodeList: r.episodeList,
         ),
       );
       emit(result);

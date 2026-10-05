@@ -67,7 +67,15 @@ class Section2 extends StatelessWidget {
         ),
         BlocBuilder<DownloadsBloc, DownloadsState>(
           builder: (context, state) {
-            // print(state.downloads![0].posterPath);
+            final img1 = state.downloads.isNotEmpty
+                ? resolveImageUrl(state.downloads[0].posterPath, null)
+                : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500';
+            final img2 = state.downloads.length > 1
+                ? resolveImageUrl(state.downloads[1].posterPath, null)
+                : img1;
+            final img3 = state.downloads.length > 2
+                ? resolveImageUrl(state.downloads[2].posterPath, null)
+                : img1;
             return SizedBox(
               width: size.width,
               height: size.width,
@@ -83,23 +91,20 @@ class Section2 extends StatelessWidget {
                             radius: size.width * 0.37,
                           ),
                           DownloadsImageWidget(
-                            imageList:
-                                "$imageAppendUrl${state.downloads[0].posterPath}",
+                            imageList: img1,
                             margin: const EdgeInsets.only(
                                 left: 140, bottom: 10, top: 45),
                             angle: 15,
                             size: Size(size.width * 0.4, size.width * 0.58),
                           ),
                           DownloadsImageWidget(
-                              imageList:
-                                  '$imageAppendUrl${state.downloads[1].posterPath}',
+                              imageList: img2,
                               margin: const EdgeInsets.only(
                                   right: 140, bottom: 10, top: 45),
                               angle: -15,
                               size: Size(size.width * 0.4, size.width * 0.58)),
                           DownloadsImageWidget(
-                            imageList:
-                                '$imageAppendUrl${state.downloads[2].posterPath}',
+                            imageList: img3,
                             margin: const EdgeInsets.only(
                                 left: 0, bottom: 20, top: 20),
                             size: Size(

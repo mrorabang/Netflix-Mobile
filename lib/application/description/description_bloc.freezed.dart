@@ -1,7 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'description_bloc.dart';
 
@@ -12,24 +12,24 @@ part of 'description_bloc.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$DescriptionEvent {
-  int get id => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(int id) loadDataMovie,
+    required TResult Function(String id) loadDataMovie,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(int id)? loadDataMovie,
+    TResult? Function(String id)? loadDataMovie,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(int id)? loadDataMovie,
+    TResult Function(String id)? loadDataMovie,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -40,7 +40,7 @@ mixin _$DescriptionEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(LoadDataMovie value)? loadDataMovie,
+    TResult? Function(LoadDataMovie value)? loadDataMovie,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -59,73 +59,75 @@ mixin _$DescriptionEvent {
 abstract class $DescriptionEventCopyWith<$Res> {
   factory $DescriptionEventCopyWith(
           DescriptionEvent value, $Res Function(DescriptionEvent) then) =
-      _$DescriptionEventCopyWithImpl<$Res>;
-  $Res call({int id});
+      _$DescriptionEventCopyWithImpl<$Res, DescriptionEvent>;
+  @useResult
+  $Res call({String id});
 }
 
 /// @nodoc
-class _$DescriptionEventCopyWithImpl<$Res>
+class _$DescriptionEventCopyWithImpl<$Res, $Val extends DescriptionEvent>
     implements $DescriptionEventCopyWith<$Res> {
   _$DescriptionEventCopyWithImpl(this._value, this._then);
 
-  final DescriptionEvent _value;
   // ignore: unused_field
-  final $Res Function(DescriptionEvent) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
+    Object? id = null,
   }) {
     return _then(_value.copyWith(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+              as String,
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$LoadDataMovieCopyWith<$Res>
+abstract class _$$LoadDataMovieImplCopyWith<$Res>
     implements $DescriptionEventCopyWith<$Res> {
-  factory _$$LoadDataMovieCopyWith(
-          _$LoadDataMovie value, $Res Function(_$LoadDataMovie) then) =
-      __$$LoadDataMovieCopyWithImpl<$Res>;
+  factory _$$LoadDataMovieImplCopyWith(
+          _$LoadDataMovieImpl value, $Res Function(_$LoadDataMovieImpl) then) =
+      __$$LoadDataMovieImplCopyWithImpl<$Res>;
   @override
-  $Res call({int id});
+  @useResult
+  $Res call({String id});
 }
 
 /// @nodoc
-class __$$LoadDataMovieCopyWithImpl<$Res>
-    extends _$DescriptionEventCopyWithImpl<$Res>
-    implements _$$LoadDataMovieCopyWith<$Res> {
-  __$$LoadDataMovieCopyWithImpl(
-      _$LoadDataMovie _value, $Res Function(_$LoadDataMovie) _then)
-      : super(_value, (v) => _then(v as _$LoadDataMovie));
+class __$$LoadDataMovieImplCopyWithImpl<$Res>
+    extends _$DescriptionEventCopyWithImpl<$Res, _$LoadDataMovieImpl>
+    implements _$$LoadDataMovieImplCopyWith<$Res> {
+  __$$LoadDataMovieImplCopyWithImpl(
+      _$LoadDataMovieImpl _value, $Res Function(_$LoadDataMovieImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _$LoadDataMovie get _value => super._value as _$LoadDataMovie;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
+    Object? id = null,
   }) {
-    return _then(_$LoadDataMovie(
-      id: id == freezed
+    return _then(_$LoadDataMovieImpl(
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
     ));
   }
 }
 
 /// @nodoc
 
-class _$LoadDataMovie implements LoadDataMovie {
-  const _$LoadDataMovie({required this.id});
+class _$LoadDataMovieImpl implements LoadDataMovie {
+  const _$LoadDataMovieImpl({required this.id});
 
   @override
-  final int id;
+  final String id;
 
   @override
   String toString() {
@@ -133,26 +135,26 @@ class _$LoadDataMovie implements LoadDataMovie {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$LoadDataMovie &&
-            const DeepCollectionEquality().equals(other.id, id));
+            other is _$LoadDataMovieImpl &&
+            (identical(other.id, id) || other.id == id));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(id));
+  int get hashCode => Object.hash(runtimeType, id);
 
   @JsonKey(ignore: true)
   @override
-  _$$LoadDataMovieCopyWith<_$LoadDataMovie> get copyWith =>
-      __$$LoadDataMovieCopyWithImpl<_$LoadDataMovie>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$LoadDataMovieImplCopyWith<_$LoadDataMovieImpl> get copyWith =>
+      __$$LoadDataMovieImplCopyWithImpl<_$LoadDataMovieImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(int id) loadDataMovie,
+    required TResult Function(String id) loadDataMovie,
   }) {
     return loadDataMovie(id);
   }
@@ -160,7 +162,7 @@ class _$LoadDataMovie implements LoadDataMovie {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(int id)? loadDataMovie,
+    TResult? Function(String id)? loadDataMovie,
   }) {
     return loadDataMovie?.call(id);
   }
@@ -168,7 +170,7 @@ class _$LoadDataMovie implements LoadDataMovie {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(int id)? loadDataMovie,
+    TResult Function(String id)? loadDataMovie,
     required TResult orElse(),
   }) {
     if (loadDataMovie != null) {
@@ -188,7 +190,7 @@ class _$LoadDataMovie implements LoadDataMovie {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(LoadDataMovie value)? loadDataMovie,
+    TResult? Function(LoadDataMovie value)? loadDataMovie,
   }) {
     return loadDataMovie?.call(this);
   }
@@ -207,13 +209,13 @@ class _$LoadDataMovie implements LoadDataMovie {
 }
 
 abstract class LoadDataMovie implements DescriptionEvent {
-  const factory LoadDataMovie({required final int id}) = _$LoadDataMovie;
+  const factory LoadDataMovie({required final String id}) = _$LoadDataMovieImpl;
 
   @override
-  int get id;
+  String get id;
   @override
   @JsonKey(ignore: true)
-  _$$LoadDataMovieCopyWith<_$LoadDataMovie> get copyWith =>
+  _$$LoadDataMovieImplCopyWith<_$LoadDataMovieImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -227,6 +229,7 @@ mixin _$DescriptionState {
   double get voteAverage => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   bool get isError => throw _privateConstructorUsedError;
+  List<EpisodeItemModel> get episodeList => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $DescriptionStateCopyWith<DescriptionState> get copyWith =>
@@ -237,7 +240,8 @@ mixin _$DescriptionState {
 abstract class $DescriptionStateCopyWith<$Res> {
   factory $DescriptionStateCopyWith(
           DescriptionState value, $Res Function(DescriptionState) then) =
-      _$DescriptionStateCopyWithImpl<$Res>;
+      _$DescriptionStateCopyWithImpl<$Res, DescriptionState>;
+  @useResult
   $Res call(
       {String title,
       String overview,
@@ -246,73 +250,82 @@ abstract class $DescriptionStateCopyWith<$Res> {
       String status,
       double voteAverage,
       bool isLoading,
-      bool isError});
+      bool isError,
+      List<EpisodeItemModel> episodeList});
 }
 
 /// @nodoc
-class _$DescriptionStateCopyWithImpl<$Res>
+class _$DescriptionStateCopyWithImpl<$Res, $Val extends DescriptionState>
     implements $DescriptionStateCopyWith<$Res> {
   _$DescriptionStateCopyWithImpl(this._value, this._then);
 
-  final DescriptionState _value;
   // ignore: unused_field
-  final $Res Function(DescriptionState) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = freezed,
-    Object? overview = freezed,
-    Object? posterPath = freezed,
-    Object? relaseDate = freezed,
-    Object? status = freezed,
-    Object? voteAverage = freezed,
-    Object? isLoading = freezed,
-    Object? isError = freezed,
+    Object? title = null,
+    Object? overview = null,
+    Object? posterPath = null,
+    Object? relaseDate = null,
+    Object? status = null,
+    Object? voteAverage = null,
+    Object? isLoading = null,
+    Object? isError = null,
+    Object? episodeList = null,
   }) {
     return _then(_value.copyWith(
-      title: title == freezed
+      title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      overview: overview == freezed
+      overview: null == overview
           ? _value.overview
           : overview // ignore: cast_nullable_to_non_nullable
               as String,
-      posterPath: posterPath == freezed
+      posterPath: null == posterPath
           ? _value.posterPath
           : posterPath // ignore: cast_nullable_to_non_nullable
               as String,
-      relaseDate: relaseDate == freezed
+      relaseDate: null == relaseDate
           ? _value.relaseDate
           : relaseDate // ignore: cast_nullable_to_non_nullable
               as String,
-      status: status == freezed
+      status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
-      voteAverage: voteAverage == freezed
+      voteAverage: null == voteAverage
           ? _value.voteAverage
           : voteAverage // ignore: cast_nullable_to_non_nullable
               as double,
-      isLoading: isLoading == freezed
+      isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
-      isError: isError == freezed
+      isError: null == isError
           ? _value.isError
           : isError // ignore: cast_nullable_to_non_nullable
               as bool,
-    ));
+      episodeList: null == episodeList
+          ? _value.episodeList
+          : episodeList // ignore: cast_nullable_to_non_nullable
+              as List<EpisodeItemModel>,
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$_InitialCopyWith<$Res>
+abstract class _$$InitialImplCopyWith<$Res>
     implements $DescriptionStateCopyWith<$Res> {
-  factory _$$_InitialCopyWith(
-          _$_Initial value, $Res Function(_$_Initial) then) =
-      __$$_InitialCopyWithImpl<$Res>;
+  factory _$$InitialImplCopyWith(
+          _$InitialImpl value, $Res Function(_$InitialImpl) then) =
+      __$$InitialImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String title,
       String overview,
@@ -321,71 +334,76 @@ abstract class _$$_InitialCopyWith<$Res>
       String status,
       double voteAverage,
       bool isLoading,
-      bool isError});
+      bool isError,
+      List<EpisodeItemModel> episodeList});
 }
 
 /// @nodoc
-class __$$_InitialCopyWithImpl<$Res>
-    extends _$DescriptionStateCopyWithImpl<$Res>
-    implements _$$_InitialCopyWith<$Res> {
-  __$$_InitialCopyWithImpl(_$_Initial _value, $Res Function(_$_Initial) _then)
-      : super(_value, (v) => _then(v as _$_Initial));
+class __$$InitialImplCopyWithImpl<$Res>
+    extends _$DescriptionStateCopyWithImpl<$Res, _$InitialImpl>
+    implements _$$InitialImplCopyWith<$Res> {
+  __$$InitialImplCopyWithImpl(
+      _$InitialImpl _value, $Res Function(_$InitialImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _$_Initial get _value => super._value as _$_Initial;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = freezed,
-    Object? overview = freezed,
-    Object? posterPath = freezed,
-    Object? relaseDate = freezed,
-    Object? status = freezed,
-    Object? voteAverage = freezed,
-    Object? isLoading = freezed,
-    Object? isError = freezed,
+    Object? title = null,
+    Object? overview = null,
+    Object? posterPath = null,
+    Object? relaseDate = null,
+    Object? status = null,
+    Object? voteAverage = null,
+    Object? isLoading = null,
+    Object? isError = null,
+    Object? episodeList = null,
   }) {
-    return _then(_$_Initial(
-      title: title == freezed
+    return _then(_$InitialImpl(
+      title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      overview: overview == freezed
+      overview: null == overview
           ? _value.overview
           : overview // ignore: cast_nullable_to_non_nullable
               as String,
-      posterPath: posterPath == freezed
+      posterPath: null == posterPath
           ? _value.posterPath
           : posterPath // ignore: cast_nullable_to_non_nullable
               as String,
-      relaseDate: relaseDate == freezed
+      relaseDate: null == relaseDate
           ? _value.relaseDate
           : relaseDate // ignore: cast_nullable_to_non_nullable
               as String,
-      status: status == freezed
+      status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
-      voteAverage: voteAverage == freezed
+      voteAverage: null == voteAverage
           ? _value.voteAverage
           : voteAverage // ignore: cast_nullable_to_non_nullable
               as double,
-      isLoading: isLoading == freezed
+      isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
-      isError: isError == freezed
+      isError: null == isError
           ? _value.isError
           : isError // ignore: cast_nullable_to_non_nullable
               as bool,
+      episodeList: null == episodeList
+          ? _value._episodeList
+          : episodeList // ignore: cast_nullable_to_non_nullable
+              as List<EpisodeItemModel>,
     ));
   }
 }
 
 /// @nodoc
 
-class _$_Initial implements _Initial {
-  const _$_Initial(
+class _$InitialImpl implements _Initial {
+  const _$InitialImpl(
       {required this.title,
       required this.overview,
       required this.posterPath,
@@ -393,7 +411,9 @@ class _$_Initial implements _Initial {
       required this.status,
       required this.voteAverage,
       required this.isLoading,
-      required this.isError});
+      required this.isError,
+      final List<EpisodeItemModel> episodeList = const []})
+      : _episodeList = episodeList;
 
   @override
   final String title;
@@ -411,46 +431,60 @@ class _$_Initial implements _Initial {
   final bool isLoading;
   @override
   final bool isError;
-
+  final List<EpisodeItemModel> _episodeList;
   @override
-  String toString() {
-    return 'DescriptionState(title: $title, overview: $overview, posterPath: $posterPath, relaseDate: $relaseDate, status: $status, voteAverage: $voteAverage, isLoading: $isLoading, isError: $isError)';
+  @JsonKey()
+  List<EpisodeItemModel> get episodeList {
+    if (_episodeList is EqualUnmodifiableListView) return _episodeList;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_episodeList);
   }
 
   @override
-  bool operator ==(dynamic other) {
+  String toString() {
+    return 'DescriptionState(title: $title, overview: $overview, posterPath: $posterPath, relaseDate: $relaseDate, status: $status, voteAverage: $voteAverage, isLoading: $isLoading, isError: $isError, episodeList: $episodeList)';
+  }
+
+  @override
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_Initial &&
-            const DeepCollectionEquality().equals(other.title, title) &&
-            const DeepCollectionEquality().equals(other.overview, overview) &&
+            other is _$InitialImpl &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.overview, overview) ||
+                other.overview == overview) &&
+            (identical(other.posterPath, posterPath) ||
+                other.posterPath == posterPath) &&
+            (identical(other.relaseDate, relaseDate) ||
+                other.relaseDate == relaseDate) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.voteAverage, voteAverage) ||
+                other.voteAverage == voteAverage) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.isError, isError) || other.isError == isError) &&
             const DeepCollectionEquality()
-                .equals(other.posterPath, posterPath) &&
-            const DeepCollectionEquality()
-                .equals(other.relaseDate, relaseDate) &&
-            const DeepCollectionEquality().equals(other.status, status) &&
-            const DeepCollectionEquality()
-                .equals(other.voteAverage, voteAverage) &&
-            const DeepCollectionEquality().equals(other.isLoading, isLoading) &&
-            const DeepCollectionEquality().equals(other.isError, isError));
+                .equals(other._episodeList, _episodeList));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(title),
-      const DeepCollectionEquality().hash(overview),
-      const DeepCollectionEquality().hash(posterPath),
-      const DeepCollectionEquality().hash(relaseDate),
-      const DeepCollectionEquality().hash(status),
-      const DeepCollectionEquality().hash(voteAverage),
-      const DeepCollectionEquality().hash(isLoading),
-      const DeepCollectionEquality().hash(isError));
+      title,
+      overview,
+      posterPath,
+      relaseDate,
+      status,
+      voteAverage,
+      isLoading,
+      isError,
+      const DeepCollectionEquality().hash(_episodeList));
 
   @JsonKey(ignore: true)
   @override
-  _$$_InitialCopyWith<_$_Initial> get copyWith =>
-      __$$_InitialCopyWithImpl<_$_Initial>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$InitialImplCopyWith<_$InitialImpl> get copyWith =>
+      __$$InitialImplCopyWithImpl<_$InitialImpl>(this, _$identity);
 }
 
 abstract class _Initial implements DescriptionState {
@@ -462,7 +496,8 @@ abstract class _Initial implements DescriptionState {
       required final String status,
       required final double voteAverage,
       required final bool isLoading,
-      required final bool isError}) = _$_Initial;
+      required final bool isError,
+      final List<EpisodeItemModel> episodeList}) = _$InitialImpl;
 
   @override
   String get title;
@@ -481,7 +516,9 @@ abstract class _Initial implements DescriptionState {
   @override
   bool get isError;
   @override
+  List<EpisodeItemModel> get episodeList;
+  @override
   @JsonKey(ignore: true)
-  _$$_InitialCopyWith<_$_Initial> get copyWith =>
+  _$$InitialImplCopyWith<_$InitialImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

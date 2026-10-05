@@ -9,27 +9,52 @@ class MainTitleCard extends StatelessWidget {
     required this.title,
     required this.posterList,
     required this.id,
+    this.titles,
+    this.releaseDates,
   }) : super(key: key);
+
   final String title;
   final List<String?> posterList;
-  final List<int?> id;
+  final List<String?> id;
+  final List<String?>? titles;
+  final List<String?>? releaseDates;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        MainTitle(title: title),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: MainTitle(title: title),
+        ),
         kHeight,
         LimitedBox(
-          maxHeight: 200,
-          child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: List.generate(
-                  posterList.length,
-                  (index) => MainCard(
-                        id: id[index]!,
-                        imageUrl: posterList[index]!,
-                      ))),
+          maxHeight: 250,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            itemCount: posterList.length,
+            itemBuilder: (context, index) {
+              final movieId =
+                  (index < id.length && id[index] != null) ? id[index]! : '';
+              final poster = posterList[index] ?? '';
+              final movieTitle = (titles != null && index < titles!.length)
+                  ? titles![index]
+                  : null;
+              final movieYear =
+                  (releaseDates != null && index < releaseDates!.length)
+                      ? releaseDates![index]
+                      : null;
+
+              return MainCard(
+                id: movieId,
+                imageUrl: poster,
+                title: movieTitle,
+                releaseDate: movieYear,
+              );
+            },
+          ),
         )
       ],
     );

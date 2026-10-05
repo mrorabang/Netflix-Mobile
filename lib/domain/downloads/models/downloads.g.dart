@@ -6,13 +6,14 @@ part of 'downloads.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_Downloads _$$_DownloadsFromJson(Map<String, dynamic> json) => _$_Downloads(
+_$DownloadsImpl _$$DownloadsImplFromJson(Map<String, dynamic> json) =>
+    _$DownloadsImpl(
       posterPath: json['poster_path'] as String?,
-      id: json['id'] as int?,
+      id: json['id'] as String?,
       title: json['title'] as String?,
     );
 
-Map<String, dynamic> _$$_DownloadsToJson(_$_Downloads instance) =>
+Map<String, dynamic> _$$DownloadsImplToJson(_$DownloadsImpl instance) =>
     <String, dynamic>{
       'poster_path': instance.posterPath,
       'id': instance.id,

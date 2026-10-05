@@ -10,9 +10,9 @@ DescriptionResp _$DescriptionRespFromJson(Map<String, dynamic> json) =>
     DescriptionResp(
       adult: json['adult'] as bool?,
       backdropPath: json['backdrop_path'] as String?,
-      budget: json['budget'] as int?,
+      budget: (json['budget'] as num?)?.toInt(),
       homepage: json['homepage'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       imdbId: json['imdb_id'] as String?,
       originalLanguage: json['original_language'] as String?,
       originalTitle: json['original_title'] as String?,
@@ -20,14 +20,14 @@ DescriptionResp _$DescriptionRespFromJson(Map<String, dynamic> json) =>
       popularity: (json['popularity'] as num?)?.toDouble(),
       posterPath: json['poster_path'] as String?,
       releaseDate: json['release_date'] as String?,
-      revenue: json['revenue'] as int?,
-      runtime: json['runtime'] as int?,
+      revenue: (json['revenue'] as num?)?.toInt(),
+      runtime: (json['runtime'] as num?)?.toInt(),
       status: json['status'] as String?,
       tagline: json['tagline'] as String?,
       title: json['title'] as String?,
       video: json['video'] as bool?,
       voteAverage: (json['vote_average'] as num?)?.toDouble(),
-      voteCount: json['vote_count'] as int?,
+      voteCount: (json['vote_count'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$DescriptionRespToJson(DescriptionResp instance) =>

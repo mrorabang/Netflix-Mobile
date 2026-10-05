@@ -10,7 +10,8 @@ class DescriptionState with _$DescriptionState {
       required String status,
       required double voteAverage,
       required bool isLoading,
-      required bool isError}) = _Initial;
+      required bool isError,
+      @Default([]) List<EpisodeItemModel> episodeList}) = _Initial;
   factory DescriptionState.initial() => const DescriptionState(
         title: "",
         overview: "",
@@ -20,5 +21,6 @@ class DescriptionState with _$DescriptionState {
         voteAverage: 0,
         isLoading: false,
         isError: false,
+        episodeList: [],
       );
 }

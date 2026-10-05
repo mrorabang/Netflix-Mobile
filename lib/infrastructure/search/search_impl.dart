@@ -16,14 +16,10 @@ class searchImpl implements SearchService {
       {required String movieQuery}) async {
     try {
       final Response response = await Dio(BaseOptions()).get(
-        ApiEndPoints.search,
-        queryParameters: {
-          'query': movieQuery,
-        },
+        '${ApiEndPoints.search}?keyword=${Uri.encodeComponent(movieQuery)}',
       );
-      // log(response.data.toString());
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final result = SearchResp.fromJson(response.data);
+        final result = SearchResp.fromApiJson(response.data);
         return Right(result);
       } else {
         return const Left(MainFailure.serverFailure());

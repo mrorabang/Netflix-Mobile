@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:netflix_clone/presentation/main_page/widgets/screen_main_page.dart';
-import 'package:netflix_clone/presentation/onStartPage/scrren_onboarding.dart';
 
 class ScreenSplash extends StatefulWidget {
   const ScreenSplash({Key? key}) : super(key: key);
@@ -13,16 +12,18 @@ class ScreenSplash extends StatefulWidget {
 class _ScreenSplashState extends State<ScreenSplash> {
   @override
   void initState() {
+    super.initState();
     navigatorHome();
   }
 
   navigatorHome() async {
     await Future.delayed(
-      const Duration(seconds: 5),
+      const Duration(milliseconds: 2200),
     );
-    Navigator.of(context).push(
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (ctx) => const ScreenOnStart(),
+        builder: (ctx) => ScreenMainPage(),
       ),
     );
   }

@@ -17,9 +17,8 @@ class HotAndNewImplementation implements HotAndNewService {
       final Response response = await Dio(BaseOptions()).get(
         ApiEndPoints.hotAndNewMovie,
       );
-      // log(response.data.toString());
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final result = HotAndNewDataResp.fromJson(response.data);
+        final result = HotAndNewDataResp.fromApiJson(response.data);
         return Right(result);
       } else {
         return const Left(MainFailure.serverFailure());
@@ -36,9 +35,8 @@ class HotAndNewImplementation implements HotAndNewService {
       final Response response = await Dio(BaseOptions()).get(
         ApiEndPoints.hotAndNewTv,
       );
-      // log(response.data.toString());
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final result = HotAndNewDataResp.fromJson(response.data);
+        final result = HotAndNewDataResp.fromApiJson(response.data);
         return Right(result);
       } else {
         return const Left(MainFailure.serverFailure());
