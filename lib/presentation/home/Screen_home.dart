@@ -6,6 +6,7 @@ import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
 import 'package:netflix_clone/presentation/home/widget/background_card.dart';
 import 'package:netflix_clone/presentation/widget/main_title_card.dart';
+import 'package:netflix_clone/presentation/category/screen_category_movies.dart';
 
 // ignore: must_be_immutable
 class ScreenHome extends StatelessWidget {
@@ -248,22 +249,79 @@ class ScreenHome extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Row(
+                            Row(
                               mainAxisAlignment:
                                   MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text(
-                                  "Phim Bộ",
-                                  style: kHomeTitleText,
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const ScreenCategoryMovies(
+                                          initialTitle: "Phim Bộ",
+                                          type: CategoryType.phimBo,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 6),
+                                    child: const Text(
+                                      "Phim Bộ",
+                                      style: kHomeTitleText,
+                                    ),
+                                  ),
                                 ),
-                                Text(
-                                  "Phim Lẻ",
-                                  style: kHomeTitleText,
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const ScreenCategoryMovies(
+                                          initialTitle: "Phim Lẻ",
+                                          type: CategoryType.phimLe,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 6),
+                                    child: const Text(
+                                      "Phim Lẻ",
+                                      style: kHomeTitleText,
+                                    ),
+                                  ),
                                 ),
-                                Text(
-                                  "Thể Loại",
-                                  style: kHomeTitleText,
-                                )
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    showTheLoaiBottomSheet(context);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 6),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Text(
+                                          "Thể Loại",
+                                          style: kHomeTitleText,
+                                        ),
+                                        SizedBox(width: 3),
+                                        Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 10),

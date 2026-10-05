@@ -180,9 +180,16 @@ class ComingSoonWidgetList extends StatelessWidget {
               itemBuilder: (BuildContext context, index) {
                 final movie = state.comingSoonList[index];
                 final rawDate = movie.releaseDate?.trim() ?? '';
-                final releaseYear = rawDate.isNotEmpty
-                    ? (rawDate.contains('-') ? rawDate.split('-')[0] : rawDate)
-                    : '2024';
+                String month = 'NĂM';
+                String day = rawDate.isNotEmpty ? rawDate : '2024';
+
+                if (rawDate.contains('-')) {
+                  final parts = rawDate.split('-');
+                  if (parts.length >= 2) {
+                    month = 'T.${parts[1]}';
+                    day = parts.length >= 3 ? parts[2] : parts[0];
+                  }
+                }
 
                 final image = resolveImageUrl(
                   movie.backdropPath,
@@ -194,7 +201,8 @@ class ComingSoonWidgetList extends StatelessWidget {
 
                 return ComingSoonWidget(
                   id: movie.id ?? '',
-                  year: releaseYear,
+                  month: month,
+                  day: day,
                   posterPath: image,
                   movieName: title,
                   decription: movie.overview ?? '',
