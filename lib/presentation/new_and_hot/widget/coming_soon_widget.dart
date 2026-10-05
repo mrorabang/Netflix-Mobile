@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
-
+import 'package:netflix_clone/presentation/decriptions/Screen_decription.dart';
 import '../../home/widget/custom_button_widget.dart';
 import '../../widget/video_widget.dart';
 
@@ -12,6 +12,7 @@ class ComingSoonWidget extends StatelessWidget {
   final String posterPath;
   final String movieName;
   final String decription;
+
   const ComingSoonWidget({
     Key? key,
     required this.id,
@@ -22,100 +23,124 @@ class ComingSoonWidget extends StatelessWidget {
     required this.decription,
   }) : super(key: key);
 
+  void _navigateToDetail(BuildContext context) {
+    if (id.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => ScreenDescription(id: id),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Row(
-      children: [
-        SizedBox(
-          width: 50,
-          height: 450,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                month,
-                style: const TextStyle(fontSize: 16, color: kGray),
-              ),
-              Text(
-                day,
-                style: const TextStyle(
-                    fontSize: 30,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24, right: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left date pillar
+          SizedBox(
+            width: 55,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  month.isNotEmpty ? month : "NĂM",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  day.isNotEmpty ? day : "2024",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        SizedBox(
-          width: size.width - 50,
-          height: 450,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              VideoWidget(
-                imageUrl: posterPath,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Main content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                VideoWidget(
+                  imageUrl: posterPath,
+                  onTap: () => _navigateToDetail(context),
+                ),
+                const SizedBox(height: 12),
+                Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        movieName,
-                        softWrap: false,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            letterSpacing: -3,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
+                      child: GestureDetector(
+                        onTap: () => _navigateToDetail(context),
+                        child: Text(
+                          movieName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                    // const Spacer(),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: const [
-                          CustomButtonWidget(
-                            icon: Icons.notifications,
-                            title: "Remind me",
-                            iconSize: 20,
-                            textSize: 12,
-                            letterSpacingtext: 0,
-                          ),
-                          kWidth,
-                          CustomButtonWidget(
-                            icon: Icons.info,
-                            title: "Info",
-                            iconSize: 20,
-                            textSize: 12,
-                          ),
-                          kWidth
-                        ],
+                    const SizedBox(width: 8),
+                    const CustomButtonWidget(
+                      icon: Icons.notifications_none,
+                      title: "Nhắc tôi",
+                      iconSize: 20,
+                      textSize: 11,
+                    ),
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: () => _navigateToDetail(context),
+                      child: const CustomButtonWidget(
+                        icon: Icons.info_outline,
+                        title: "Chi tiết",
+                        iconSize: 20,
+                        textSize: 11,
                       ),
                     ),
                   ],
                 ),
-              ),
-              kHeight,
-              const Text("coming on Friday"),
-              kHeight,
-              Text(
-                movieName,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              kHeight,
-              Text(decription,
+                const SizedBox(height: 8),
+                Text(
+                  "Sắp ra mắt trên Netflix",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withOpacity(0.85),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  decription.isNotEmpty
+                      ? decription
+                      : "Bộ phim hấp dẫn sắp có mặt trên Netflix. Hãy cùng đón xem những tình tiết bất ngờ và kịch tính nhất!",
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: kGray, fontSize: 15))
-            ],
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

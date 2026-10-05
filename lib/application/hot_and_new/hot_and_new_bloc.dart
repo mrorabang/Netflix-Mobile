@@ -16,21 +16,18 @@ class HotAndNewBloc extends Bloc<HotAndNewEvent, HotAndNewState> {
   HotAndNewBloc(this._hotAndNewService) : super(HotAndNewState.initial()) {
     // get hot and new movie data
     on<LoadDataInComingSoon>((event, emit) async {
-      // send loading to ui
-      emit(const HotAndNewState(
-          comingSoonList: [],
-          everyOneIsWatchingList: [],
+      emit(HotAndNewState(
+          comingSoonList: state.comingSoonList,
+          everyOneIsWatchingList: state.everyOneIsWatchingList,
           isLoading: true,
           hasError: false));
-      // get data from remote
       final _result = await _hotAndNewService.getHotAndNewMovieData();
-      // data in state
       final newState = _result.fold((MainFailure f) {
-        return const HotAndNewState(
-            comingSoonList: [],
-            everyOneIsWatchingList: [],
+        return HotAndNewState(
+            comingSoonList: state.comingSoonList,
+            everyOneIsWatchingList: state.everyOneIsWatchingList,
             isLoading: false,
-            hasError: true);
+            hasError: state.comingSoonList.isEmpty);
       }, (HotAndNewDataResp resp) {
         return HotAndNewState(
             comingSoonList: resp.results,
@@ -42,20 +39,18 @@ class HotAndNewBloc extends Bloc<HotAndNewEvent, HotAndNewState> {
     });
     // get hot and new tv data
     on<LoadDataInEveryOnesWatching>((event, emit) async {
-      emit(const HotAndNewState(
-          comingSoonList: [],
-          everyOneIsWatchingList: [],
+      emit(HotAndNewState(
+          comingSoonList: state.comingSoonList,
+          everyOneIsWatchingList: state.everyOneIsWatchingList,
           isLoading: true,
           hasError: false));
-      // get data from remote
       final _result = await _hotAndNewService.getHotAndNewTvData();
-      // data in state
       final newState = _result.fold((MainFailure f) {
-        return const HotAndNewState(
-            comingSoonList: [],
-            everyOneIsWatchingList: [],
+        return HotAndNewState(
+            comingSoonList: state.comingSoonList,
+            everyOneIsWatchingList: state.everyOneIsWatchingList,
             isLoading: false,
-            hasError: true);
+            hasError: state.everyOneIsWatchingList.isEmpty);
       }, (HotAndNewDataResp resp) {
         return HotAndNewState(
             comingSoonList: state.comingSoonList,

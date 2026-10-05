@@ -1,13 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
-import 'package:netflix_clone/presentation/home/widget/custom_button_widget.dart';
-import 'package:netflix_clone/presentation/widget/app_bar_widget.dart';
-import 'package:netflix_clone/presentation/widget/video_widget.dart';
 
 import '../../application/hot_and_new/hot_and_new_bloc.dart';
 import 'widget/coming_soon_widget.dart';
@@ -21,47 +15,93 @@ class ScreenNewAndHot extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: backgrounndColor,
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(90),
+          preferredSize: const Size.fromHeight(95),
           child: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
             automaticallyImplyLeading: false,
             title: const Text(
-              "New & Hot",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              "Mới & Thịnh Hành",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             actions: [
               const Icon(
                 Icons.cast,
-                size: 30,
+                size: 24,
                 color: kwhiteColor,
               ),
               kWidth,
               Container(
-                margin: EdgeInsets.symmetric(vertical: 5),
-                color: Colors.blue,
-                width: 30,
-                height: 30,
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.red[700],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Center(
+                  child: Text(
+                    "N",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
               kWidth,
             ],
-            bottom: TabBar(
-              labelColor: kBlackColor,
-              isScrollable: true,
-              unselectedLabelColor: kwhiteColor,
-              labelStyle:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              indicator: BoxDecoration(
-                color: kwhiteColor,
-                borderRadius: kRadius30,
-              ),
-              tabs: const [
-                Tab(
-                  text: "🍿Coming Soon",
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(40),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10, bottom: 6),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TabBar(
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    labelColor: Colors.black,
+                    unselectedLabelColor: Colors.white,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    dividerColor: Colors.transparent,
+                    tabs: const [
+                      Tab(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "🍿 Sắp Ra Mắt",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Tab(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "🔥 Mọi Người Đang Xem",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Tab(
-                  text: "👀 Everyone's Watching",
-                )
-              ],
+              ),
             ),
           ),
         ),
@@ -71,8 +111,8 @@ class ScreenNewAndHot extends StatelessWidget {
               key: Key('coming_soon'),
             ),
             EveryOnesWatchingWidgetList(
-              key: Key('everyons_watching'),
-            )
+              key: Key('everyones_watching'),
+            ),
           ],
         ),
       ),
@@ -86,8 +126,12 @@ class ComingSoonWidgetList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      BlocProvider.of<HotAndNewBloc>(context).add(const LoadDataInComingSoon());
+      final bloc = BlocProvider.of<HotAndNewBloc>(context);
+      if (bloc.state.comingSoonList.isEmpty) {
+        bloc.add(const LoadDataInComingSoon());
+      }
     });
+
     return RefreshIndicator(
       onRefresh: () async {
         BlocProvider.of<HotAndNewBloc>(context)
@@ -95,59 +139,75 @@ class ComingSoonWidgetList extends StatelessWidget {
       },
       child: BlocBuilder<HotAndNewBloc, HotAndNewState>(
         builder: (context, state) {
-          if (state.isLoading) {
+          if (state.isLoading && state.comingSoonList.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(
                 strokeWidth: 2,
+                color: Colors.red,
               ),
             );
-          } else if (state.hasError) {
-            return const Center(
-              child: Text(
-                "error while loading coming soon list",
+          } else if (state.hasError && state.comingSoonList.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Không thể tải danh sách phim",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      BlocProvider.of<HotAndNewBloc>(context)
+                          .add(const LoadDataInComingSoon());
+                    },
+                    child: const Text("Thử lại"),
+                  ),
+                ],
               ),
             );
           } else if (state.comingSoonList.isEmpty) {
             return const Center(
               child: Text(
-                "while loading coming soon is empty",
+                "Danh sách đang cập nhật",
+                style: TextStyle(color: Colors.white),
               ),
             );
           } else {
             return ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.only(top: 16, bottom: 20),
+              itemCount: state.comingSoonList.length,
               itemBuilder: (BuildContext context, index) {
                 final movie = state.comingSoonList[index];
-                if (movie.id == null) {
-                  return const SizedBox();
-                }
-                String month = '';
-                String day = '';
-                try {
-                  final _date = DateTime.tryParse(movie.releaseDate!);
-                  final foramteDate = DateFormat.yMMMMd('en_US').format(_date!);
-                  month = foramteDate
-                      .split(' ')
-                      .first
-                      .substring(0, 3)
-                      .toUpperCase();
-                  day = movie.releaseDate!.split('-')[1];
-                } catch (e) {
-                  log(e.toString());
-                  month = '';
-                  day = '';
+                final rawDate = movie.releaseDate?.trim() ?? '';
+                String month = 'NĂM';
+                String day = rawDate.isNotEmpty ? rawDate : '2024';
+
+                if (rawDate.contains('-')) {
+                  final parts = rawDate.split('-');
+                  if (parts.length >= 2) {
+                    month = 'T.${parts[1]}';
+                    day = parts.length >= 3 ? parts[2] : parts[0];
+                  }
                 }
 
+                final image = resolveImageUrl(
+                  movie.backdropPath,
+                  movie.posterPath,
+                );
+                final title = (movie.title != null && movie.title!.isNotEmpty)
+                    ? movie.title!
+                    : (movie.originalTitle ?? 'Phim Netflix');
+
                 return ComingSoonWidget(
-                  id: movie.id.toString(),
+                  id: movie.id ?? '',
                   month: month,
                   day: day,
-                  posterPath: '$imageAppendUrl${movie.posterPath}',
-                  movieName: movie.originalTitle ?? 'No title',
-                  decription: movie.overview ?? 'no decription',
+                  posterPath: image,
+                  movieName: title,
+                  decription: movie.overview ?? '',
                 );
               },
-              itemCount: state.comingSoonList.length,
             );
           }
         },
@@ -162,9 +222,12 @@ class EveryOnesWatchingWidgetList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      BlocProvider.of<HotAndNewBloc>(context)
-          .add(const LoadDataInEveryOnesWatching());
+      final bloc = BlocProvider.of<HotAndNewBloc>(context);
+      if (bloc.state.everyOneIsWatchingList.isEmpty) {
+        bloc.add(const LoadDataInEveryOnesWatching());
+      }
     });
+
     return RefreshIndicator(
       onRefresh: () async {
         BlocProvider.of<HotAndNewBloc>(context)
@@ -172,40 +235,61 @@ class EveryOnesWatchingWidgetList extends StatelessWidget {
       },
       child: BlocBuilder<HotAndNewBloc, HotAndNewState>(
         builder: (context, state) {
-          if (state.isLoading) {
+          if (state.isLoading && state.everyOneIsWatchingList.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(
                 strokeWidth: 2,
+                color: Colors.red,
               ),
             );
-          } else if (state.hasError) {
-            return const Center(
-              child: Text(
-                "error while loading coming soon list",
+          } else if (state.hasError && state.everyOneIsWatchingList.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Không thể tải danh sách phim",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      BlocProvider.of<HotAndNewBloc>(context)
+                          .add(const LoadDataInEveryOnesWatching());
+                    },
+                    child: const Text("Thử lại"),
+                  ),
+                ],
               ),
             );
           } else if (state.everyOneIsWatchingList.isEmpty) {
             return const Center(
               child: Text(
-                "while loading every ones watching is empty",
+                "Danh sách đang cập nhật",
+                style: TextStyle(color: Colors.white),
               ),
             );
           } else {
             return ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              itemCount: state.everyOneIsWatchingList.length,
               itemBuilder: (BuildContext context, index) {
                 final tv = state.everyOneIsWatchingList[index];
-                if (tv.id == null) {
-                  return const SizedBox();
-                }
+                final image = resolveImageUrl(
+                  tv.backdropPath,
+                  tv.posterPath,
+                );
+                final title = (tv.title != null && tv.title!.isNotEmpty)
+                    ? tv.title!
+                    : (tv.originalTitle ?? 'Phim Netflix');
 
                 return EveryOnesWatchingWidget(
-                  posterPath: '$imageAppendUrl${tv.posterPath}',
-                  movieName: tv.originalName ?? 'no name',
-                  decription: tv.overview ?? 'no decrition',
+                  id: tv.id ?? '',
+                  posterPath: image,
+                  movieName: title,
+                  decription: tv.overview ?? '',
                 );
               },
-              itemCount: state.everyOneIsWatchingList.length,
             );
           }
         },
