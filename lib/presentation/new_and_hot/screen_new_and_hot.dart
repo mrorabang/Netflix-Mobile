@@ -207,14 +207,20 @@ class ComingSoonWidgetList extends StatelessWidget {
               itemBuilder: (BuildContext context, index) {
                 final movie = state.comingSoonList[index];
                 final rawDate = movie.releaseDate?.trim() ?? '';
-                String month = 'NĂM';
-                String day = rawDate.isNotEmpty ? rawDate : '2024';
+                String year = '2024';
+                String releaseInfo = 'Sắp ra mắt trên Netflix';
 
-                if (rawDate.contains('-')) {
-                  final parts = rawDate.split('-');
-                  if (parts.length >= 2) {
-                    month = 'T.${parts[1]}';
-                    day = parts.length >= 3 ? parts[2] : parts[0];
+                if (rawDate.isNotEmpty) {
+                  if (rawDate.contains('-')) {
+                    final parts = rawDate.split('-');
+                    year = parts[0];
+                    if (parts.length >= 3) {
+                      releaseInfo = 'Khởi chiếu ${parts[2]}/${parts[1]}/${parts[0]}';
+                    } else if (parts.length >= 2) {
+                      releaseInfo = 'Khởi chiếu tháng ${parts[1]}/${parts[0]}';
+                    }
+                  } else {
+                    year = rawDate;
                   }
                 }
 
@@ -228,8 +234,8 @@ class ComingSoonWidgetList extends StatelessWidget {
 
                 return ComingSoonWidget(
                   id: movie.id ?? '',
-                  month: month,
-                  day: day,
+                  year: year,
+                  releaseInfo: releaseInfo,
                   posterPath: image,
                   movieName: title,
                   decription: movie.overview ?? '',
