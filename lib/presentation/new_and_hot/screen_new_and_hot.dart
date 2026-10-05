@@ -5,6 +5,7 @@ import 'package:netflix_clone/core/constants.dart';
 
 import '../../application/hot_and_new/hot_and_new_bloc.dart';
 import '../search/screen_search.dart';
+import '../widgets/cast_modal.dart';
 import 'widget/coming_soon_widget.dart';
 import 'widget/everyones_watching_widget.dart';
 
@@ -50,10 +51,17 @@ class ScreenNewAndHot extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 14),
-              const Icon(
-                Icons.cast,
-                size: 24,
-                color: kwhiteColor,
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(
+                  Icons.cast,
+                  size: 24,
+                  color: kwhiteColor,
+                ),
+                onPressed: () {
+                  showCastBottomSheet(context);
+                },
               ),
               kWidth,
               Container(
@@ -199,20 +207,14 @@ class ComingSoonWidgetList extends StatelessWidget {
               itemBuilder: (BuildContext context, index) {
                 final movie = state.comingSoonList[index];
                 final rawDate = movie.releaseDate?.trim() ?? '';
-                String year = '2024';
-                String releaseInfo = 'Sắp ra mắt trên Netflix';
+                String month = 'NĂM';
+                String day = rawDate.isNotEmpty ? rawDate : '2024';
 
-                if (rawDate.isNotEmpty) {
-                  if (rawDate.contains('-')) {
-                    final parts = rawDate.split('-');
-                    year = parts[0];
-                    if (parts.length >= 3) {
-                      releaseInfo = 'Khởi chiếu ${parts[2]}/${parts[1]}/${parts[0]}';
-                    } else if (parts.length >= 2) {
-                      releaseInfo = 'Khởi chiếu tháng ${parts[1]}/${parts[0]}';
-                    }
-                  } else {
-                    year = rawDate;
+                if (rawDate.contains('-')) {
+                  final parts = rawDate.split('-');
+                  if (parts.length >= 2) {
+                    month = 'T.${parts[1]}';
+                    day = parts.length >= 3 ? parts[2] : parts[0];
                   }
                 }
 
@@ -226,8 +228,8 @@ class ComingSoonWidgetList extends StatelessWidget {
 
                 return ComingSoonWidget(
                   id: movie.id ?? '',
-                  year: year,
-                  releaseInfo: releaseInfo,
+                  month: month,
+                  day: day,
                   posterPath: image,
                   movieName: title,
                   decription: movie.overview ?? '',

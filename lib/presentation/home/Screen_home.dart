@@ -9,6 +9,7 @@ import 'package:netflix_clone/presentation/home/widget/background_card.dart';
 import 'package:netflix_clone/presentation/widget/main_title_card.dart';
 import 'package:netflix_clone/presentation/category/screen_category_movies.dart';
 import 'package:netflix_clone/presentation/search/screen_search.dart';
+import 'package:netflix_clone/presentation/widgets/cast_modal.dart';
 
 // ignore: must_be_immutable
 class ScreenHome extends StatelessWidget {
@@ -251,11 +252,21 @@ class ScreenHome extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 14),
-                                      const Icon(
-                                        Icons.cast,
-                                        size: 25,
-                                        color: kwhiteColor,
+                                      const SizedBox(width: 8),
+                                      GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () {
+                                          showCastBottomSheet(context);
+                                        },
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 8),
+                                          child: Icon(
+                                            Icons.cast,
+                                            size: 26,
+                                            color: kwhiteColor,
+                                          ),
+                                        ),
                                       ),
                                       const SizedBox(width: 14),
                                       Container(
