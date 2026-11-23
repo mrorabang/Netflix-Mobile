@@ -57,40 +57,52 @@ class _ScreenWatchState extends State<ScreenWatch> {
 
   @override
   void dispose() {
-    // Reset back to portrait orientation when leaving player
+    // Restore orientation support
     SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
     ]);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          leading: IconButton(
+            autofocus: true,
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Text(
+            widget.title,
+            style: const TextStyle(fontSize: 16, color: Colors.white),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        title: Text(
-          widget.title,
-          style: const TextStyle(fontSize: 16, color: Colors.white),
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            WebViewWidget(controller: _controller),
-            if (_isLoading)
-              const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.red,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              WebViewWidget(controller: _controller),
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.red,
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

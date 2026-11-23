@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
 import 'package:netflix_clone/core/strings.dart';
@@ -639,6 +640,12 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
       );
     }
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLandscape = screenWidth > MediaQuery.of(context).size.height;
+    final crossAxisCount = screenWidth > 1200
+        ? 7
+        : (screenWidth > 800 ? 6 : (isLandscape ? 5 : 3));
+
     return RefreshIndicator(
       color: Colors.red,
       backgroundColor: Colors.black,
@@ -650,8 +657,8 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 12,
                 childAspectRatio: 1 / 1.75,
@@ -659,7 +666,7 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final movie = _movies[index];
-                  return _buildMovieCard(movie);
+                  return _CategoryMovieCard(movie: movie);
                 },
                 childCount: _movies.length,
               ),
@@ -699,133 +706,186 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
   }
 
   Widget _buildMovieCard(CategoryMovieItem movie) {
-    return GestureDetector(
-      onTap: () {
-        if (movie.id.isNotEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => ScreenDescription(id: movie.id),
-            ),
-          );
-        }
+    return _CategoryMovieCard(movie: movie);
+  }
+}
+
+class _CategoryMovieCard extends StatefulWidget {
+  final CategoryMovieItem movie;
+  const _CategoryMovieCard({Key? key, required this.movie}) : super(key: key);
+
+  @override
+  State<_CategoryMovieCard> createState() => _CategoryMovieCardState();
+}
+
+class _CategoryMovieCardState extends State<_CategoryMovieCard> {
+  bool _isFocused = false;
+
+  void _openDetail(BuildContext context) {
+    if (widget.movie.id.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => ScreenDescription(id: widget.movie.id),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final movie = widget.movie;
+    return Focus(
+      onFocusChange: (focused) {
+        setState(() => _isFocused = focused);
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Poster image with rounded corners and badges
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    color: Colors.grey[900],
-                    child: Image.network(
-                      movie.posterUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (ctx, child, progress) {
-                        if (progress == null) return child;
-                        return Container(
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            (event.logicalKey == LogicalKeyboardKey.select ||
+                event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.space)) {
+          _openDetail(context);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: GestureDetector(
+        onTap: () => _openDetail(context),
+        child: AnimatedScale(
+          scale: _isFocused ? 1.06 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: _isFocused ? Colors.white : Colors.transparent,
+                      width: 2.5,
+                    ),
+                    boxShadow: _isFocused
+                        ? [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.6),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            )
+                          ]
+                        : null,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
                           color: Colors.grey[900],
-                          child: const Center(
-                            child: SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1.8,
-                                color: Colors.red,
+                          child: Image.network(
+                            movie.posterUrl,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (ctx, child, progress) {
+                              if (progress == null) return child;
+                              return Container(
+                                color: Colors.grey[900],
+                                child: const Center(
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.8,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (ctx, err, stack) => Container(
+                              color: Colors.grey[900],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.movie_outlined,
+                                  color: Colors.grey,
+                                  size: 32,
+                                ),
                               ),
                             ),
                           ),
-                        );
-                      },
-                      errorBuilder: (ctx, err, stack) => Container(
-                        color: Colors.grey[900],
-                        child: const Center(
-                          child: Icon(
-                            Icons.movie_outlined,
-                            color: Colors.grey,
-                            size: 32,
-                          ),
                         ),
-                      ),
+                        if (movie.quality != null && movie.quality!.isNotEmpty)
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Text(
+                                movie.quality!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (movie.episodeCurrent != null &&
+                            movie.episodeCurrent!.isNotEmpty)
+                          Positioned(
+                            bottom: 5,
+                            left: 5,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.85),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Text(
+                                movie.episodeCurrent!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  // Quality badge (HD / FHD)
-                  if (movie.quality != null && movie.quality!.isNotEmpty)
-                    Positioned(
-                      top: 5,
-                      right: 5,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Text(
-                          movie.quality!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  // Episode badge (e.g. Tập 12 / Hoàn tất)
-                  if (movie.episodeCurrent != null &&
-                      movie.episodeCurrent!.isNotEmpty)
-                    Positioned(
-                      bottom: 5,
-                      left: 5,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.85),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Text(
-                          movie.episodeCurrent!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 5),
-          // Movie title
-          Text(
-            movie.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-          // Release year
-          if (movie.year != null && movie.year!.isNotEmpty) ...[
-            const SizedBox(height: 2),
-            Text(
-              movie.year!,
-              style: TextStyle(
-                fontSize: 10.5,
-                color: Colors.grey[400],
+              const SizedBox(height: 5),
+              Text(
+                movie.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight:
+                      _isFocused ? FontWeight.bold : FontWeight.w600,
+                  color: _isFocused ? Colors.redAccent : Colors.white,
+                ),
               ),
-            ),
-          ],
-        ],
+              if (movie.year != null && movie.year!.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  movie.year!,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: Colors.grey[400],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -902,11 +962,13 @@ void showTheLoaiBottomSheet(
               child: GridView.builder(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      MediaQuery.of(ctx).size.width > MediaQuery.of(ctx).size.height ? 4 : 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 2.8,
+                  childAspectRatio:
+                      MediaQuery.of(ctx).size.width > MediaQuery.of(ctx).size.height ? 3.2 : 2.8,
                 ),
                 itemCount: theLoaiNames.length,
                 itemBuilder: (context, index) {
@@ -1030,11 +1092,13 @@ void showQuocGiaBottomSheet(
               child: GridView.builder(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      MediaQuery.of(ctx).size.width > MediaQuery.of(ctx).size.height ? 4 : 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 2.8,
+                  childAspectRatio:
+                      MediaQuery.of(ctx).size.width > MediaQuery.of(ctx).size.height ? 3.2 : 2.8,
                 ),
                 itemCount: quocGiaNames.length,
                 itemBuilder: (context, index) {

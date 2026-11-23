@@ -19,11 +19,17 @@ class BackgroundCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final poster = resolveImageUrl(imageUrl, null);
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
+    final bannerHeight = isLandscape
+        ? (size.height * 0.65).clamp(280.0, 380.0)
+        : 520.0;
+
     return Stack(
       children: [
         Container(
           width: double.infinity,
-          height: 520,
+          height: bannerHeight,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(poster),

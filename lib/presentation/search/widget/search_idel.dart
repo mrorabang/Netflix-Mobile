@@ -65,6 +65,10 @@ class TopSearchItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
+    final isLandscape = screenwidth > MediaQuery.of(context).size.height;
+    final imageWidth = isLandscape ? 150.0 : screenwidth * 0.35;
+    final imageHeight = isLandscape ? 84.0 : 72.0;
+
     return InkWell(
       onTap: () {
         if (id.isNotEmpty) {
@@ -81,8 +85,8 @@ class TopSearchItemTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: Container(
-              width: screenwidth * 0.35,
-              height: 72,
+              width: imageWidth,
+              height: imageHeight,
               color: Colors.grey[900],
               child: Image.network(
                 imageUrl,

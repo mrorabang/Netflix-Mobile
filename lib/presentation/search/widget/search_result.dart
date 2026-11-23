@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netflix_clone/application/search/search_bloc.dart';
 import 'package:netflix_clone/core/constants.dart';
@@ -67,6 +68,12 @@ class SearchResult extends StatelessWidget {
       );
     }
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLandscape = screenWidth > MediaQuery.of(context).size.height;
+    final crossAxisCount = screenWidth > 1200
+        ? 7
+        : (screenWidth > 800 ? 6 : (isLandscape ? 5 : 3));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -75,8 +82,8 @@ class SearchResult extends StatelessWidget {
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
               crossAxisSpacing: 8,
               mainAxisSpacing: 14,
               childAspectRatio: 1 / 1.78,
@@ -100,7 +107,7 @@ class SearchResult extends StatelessWidget {
   }
 }
 
-class SearchResultCard extends StatelessWidget {
+class SearchResultCard extends StatefulWidget {
   final String imageUrl;
   final String id;
   final String? title;
@@ -119,108 +126,155 @@ class SearchResultCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<SearchResultCard> createState() => _SearchResultCardState();
+}
+
+class _SearchResultCardState extends State<SearchResultCard> {
+  bool _isFocused = false;
+
+  void _openDetail(BuildContext context) {
+    if (widget.id.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => ScreenDescription(id: widget.id),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (id.isNotEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => ScreenDescription(id: id),
-            ),
-          );
-        }
+    return Focus(
+      onFocusChange: (focused) {
+        setState(() => _isFocused = focused);
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    color: Colors.grey[900],
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, stack) => Container(
-                        color: Colors.grey[900],
-                        child: const Icon(Icons.movie_outlined,
-                            color: Colors.grey),
-                      ),
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            (event.logicalKey == LogicalKeyboardKey.select ||
+                event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.space)) {
+          _openDetail(context);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: GestureDetector(
+        onTap: () => _openDetail(context),
+        child: AnimatedScale(
+          scale: _isFocused ? 1.06 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: _isFocused ? Colors.white : Colors.transparent,
+                      width: 2.5,
+                    ),
+                    boxShadow: _isFocused
+                        ? [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.6),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            )
+                          ]
+                        : null,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          color: Colors.grey[900],
+                          child: Image.network(
+                            widget.imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (ctx, err, stack) => Container(
+                              color: Colors.grey[900],
+                              child: const Icon(Icons.movie_outlined,
+                                  color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                        if (widget.quality != null && widget.quality!.isNotEmpty)
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.75),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Text(
+                                widget.quality!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (widget.episode != null && widget.episode!.isNotEmpty)
+                          Positioned(
+                            bottom: 4,
+                            left: 4,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: Colors.red[800],
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Text(
+                                widget.episode!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  if (quality != null && quality!.isNotEmpty)
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 1.5),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.75),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Text(
-                          quality!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (episode != null && episode!.isNotEmpty)
-                    Positioned(
-                      bottom: 4,
-                      left: 4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 1.5),
-                        decoration: BoxDecoration(
-                          color: Colors.red[800],
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Text(
-                          episode!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(height: 4),
+              if (widget.title != null && widget.title!.isNotEmpty)
+                Text(
+                  widget.title!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight:
+                        _isFocused ? FontWeight.bold : FontWeight.w600,
+                    color: _isFocused ? Colors.redAccent : Colors.white,
+                  ),
+                ),
+              if (widget.year != null)
+                Text(
+                  "${widget.year}",
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey,
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 4),
-          if (title != null && title!.isNotEmpty)
-            Text(
-              title!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          if (year != null)
-            Text(
-              "$year",
-              style: const TextStyle(
-                fontSize: 10,
-                color: Colors.grey,
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }

@@ -101,6 +101,235 @@ class ScreenDescription extends StatelessWidget {
               state.episodeList.length == 1 &&
               state.episodeList.first.name.toLowerCase() == 'trailer';
 
+          final size = MediaQuery.of(context).size;
+          final isLandscape = size.width > size.height;
+
+          if (isLandscape) {
+            return Scaffold(
+              backgroundColor: Colors.black,
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                title: Text(
+                  state.title,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Column: Poster Image
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        width: 220,
+                        height: 330,
+                        color: Colors.grey[900],
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (ctx, err, stack) => Container(
+                            color: Colors.grey[900],
+                            child: const Center(
+                              child: Icon(Icons.movie,
+                                  size: 60, color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 28),
+                    // Right Column: Title, Badges, Details, Play Button, Episodes
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              state.title,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const RoundText(text: "18+"),
+                                kWidth,
+                                RoundText(
+                                    text: state.status.isEmpty
+                                        ? "HD"
+                                        : state.status),
+                                kWidth,
+                                RoundText(text: "⭐ ${state.voteAverage}"),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              state.overview.isEmpty
+                                  ? "Nội dung phim đang cập nhật..."
+                                  : state.overview,
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: kGray,
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            if (hasEpisodes) ...[
+                              ElevatedButton.icon(
+                                autofocus: true,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 28, vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                ),
+                                icon: Icon(
+                                  isTrailerOnly
+                                      ? Icons.movie_creation_outlined
+                                      : Icons.play_arrow,
+                                  size: 26,
+                                ),
+                                label: Text(
+                                  isTrailerOnly
+                                      ? "Xem Trailer giới thiệu"
+                                      : (state.episodeList.length > 1
+                                          ? "Phát tập 1 (${state.episodeList.first.name})"
+                                          : "Phát / Xem phim"),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: () {
+                                  final ep = state.episodeList.first;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (ctx) => ScreenWatch(
+                                        url: ep.linkEmbed,
+                                        title: "${state.title} - ${ep.name}",
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              if (state.episodeList.length > 1) ...[
+                                const SizedBox(height: 18),
+                                const Text(
+                                  "Danh sách tập phim",
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: state.episodeList.map((ep) {
+                                    return ActionChip(
+                                      backgroundColor: Colors.grey[850],
+                                      label: Text(
+                                        ep.name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (ctx) => ScreenWatch(
+                                              url: ep.linkEmbed,
+                                              title:
+                                                  "${state.title} - ${ep.name}",
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ] else ...[
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1E1E1E),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.white12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber.withOpacity(0.15),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.access_time_rounded,
+                                        color: Colors.amber,
+                                        size: 22,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Phim đang cập nhật tập mới",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          SizedBox(height: 3),
+                                          Text(
+                                            "Tập phim đang được hệ thống đồng bộ. Bạn vui lòng quay lại sau ít phút!",
+                                            style: TextStyle(
+                                              color: Colors.white60,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return ListView(
             padding: EdgeInsets.zero,
             children: [
