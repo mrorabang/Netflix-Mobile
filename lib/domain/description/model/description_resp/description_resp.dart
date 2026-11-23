@@ -17,11 +17,15 @@ class EpisodeItemModel {
   });
 
   factory EpisodeItemModel.fromJson(Map<String, dynamic> json) {
+    String link = (json['link_embed'] as String? ?? '').trim();
+    if (link.isEmpty) {
+      link = (json['link_m3u8'] as String? ?? '').trim();
+    }
     return EpisodeItemModel(
-      name: json['name'] as String? ?? 'Full',
-      slug: json['slug'] as String? ?? '',
-      filename: json['filename'] as String? ?? '',
-      linkEmbed: json['link_embed'] as String? ?? '',
+      name: (json['name'] as String? ?? 'Full').trim(),
+      slug: (json['slug'] as String? ?? '').trim(),
+      filename: (json['filename'] as String? ?? '').trim(),
+      linkEmbed: link,
     );
   }
 }
@@ -92,28 +96,74 @@ class DescriptionResp {
   }
 
   factory DescriptionResp.fromApiJson(Map<String, dynamic> json) {
-    final movie = json['movie'] as Map<String, dynamic>? ?? {};
-    final episodesRaw = json['episodes'] as List? ?? [];
+    final movie = (json['movie'] as Map<String, dynamic>?) ??
+        (json['data'] is Map ? (json['data']['item'] as Map<String, dynamic>?) : null) ??
+        {};
+    final episodesRaw = (json['episodes'] as List?) ??
+        (json['data'] is Map ? (json['data']['episodes'] as List?) : null) ??
+        [];
     List<EpisodeItemModel> epList = [];
-    if (episodesRaw.isNotEmpty) {
-      final firstServer = episodesRaw[0] as Map<String, dynamic>? ?? {};
-      final serverData = firstServer['server_data'] as List? ?? [];
-      epList = serverData.map((e) => EpisodeItemModel.fromJson(e as Map<String, dynamic>)).toList();
+
+    // Search all servers to find one that has episodes with links
+    for (final srv in episodesRaw) {
+      if (srv is Map<String, dynamic>) {
+        final serverData = srv['server_data'] as List? ?? [];
+        final items = serverData
+            .whereType<Map<String, dynamic>>()
+            .map((e) => EpisodeItemModel.fromJson(e))
+            .where((ep) => ep.linkEmbed.isNotEmpty)
+            .toList();
+        if (items.isNotEmpty) {
+          epList = items;
+          break;
+        }
+      }
     }
 
-    final poster = resolveImageUrl(movie['poster_url'], movie['thumb_url']);
+    // If still empty, check for trailer_url
+    final trailer = (movie['trailer_url'] as String? ?? '').trim();
+    if (epList.isEmpty && trailer.isNotEmpty) {
+      epList.add(EpisodeItemModel(
+        name: 'Trailer',
+        slug: 'trailer',
+        filename: 'Trailer',
+        linkEmbed: trailer,
+      ));
+    }
+
+    // Clean HTML from overview
+    String rawContent = (movie['content'] as String? ?? '').trim();
+    rawContent = rawContent
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+
+    final cdn = json['APP_DOMAIN_CDN_IMAGE'] as String? ??
+        (json['data'] is Map ? json['data']['APP_DOMAIN_CDN_IMAGE'] as String? : null) ??
+        (movie['poster_url']?.toString().startsWith('http') == true
+            ? null
+            : 'https://phimimg.com');
+
+    final poster = resolveImageUrl(movie['poster_url'], movie['thumb_url'], cdn);
     final double? vote = double.tryParse(movie['tmdb']?['vote_average']?.toString() ?? '');
 
     final quality = movie['quality'] as String? ?? 'HD';
     final lang = movie['lang'] as String? ?? 'Vietsub';
-    final time = movie['time'] as String? ?? '';
-    final statusStr = [quality, lang, if (time.isNotEmpty) '${time}m'].where((s) => s.isNotEmpty).join(' • ');
+    String time = (movie['time'] as String? ?? '').trim();
+    if (time.isNotEmpty && !time.contains('phút') && !time.endsWith('m')) {
+      time = '${time}m';
+    }
+    final statusStr = [quality, lang, time].where((s) => s.isNotEmpty).join(' • ');
 
     return DescriptionResp(
       id: 0,
-      title: movie['name'] as String? ?? '',
-      originalTitle: movie['origin_name'] as String? ?? '',
-      overview: movie['content'] as String? ?? '',
+      title: (movie['name'] as String? ?? movie['title'] as String? ?? '').trim(),
+      originalTitle: (movie['origin_name'] as String? ?? '').trim(),
+      overview: rawContent,
       posterPath: poster,
       backdropPath: poster,
       releaseDate: movie['year']?.toString() ?? '',

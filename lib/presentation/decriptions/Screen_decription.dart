@@ -21,34 +21,88 @@ class ScreenDescription extends StatelessWidget {
       BlocProvider.of<DescriptionBloc>(context).add(LoadDataMovie(id: id));
     });
     return Scaffold(
+      backgroundColor: Colors.black,
       body: BlocBuilder<DescriptionBloc, DescriptionState>(
         builder: (context, state) {
           final imageUrl = resolveImageUrl(state.posterPath, null);
           if (state.isLoading) {
             return const Center(
               child: CircularProgressIndicator(
-                strokeWidth: 2,
+                strokeWidth: 2.5,
+                color: Colors.red,
               ),
             );
           } else if (state.isError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Không thể tải thông tin phim"),
-                  kHeight,
-                  ElevatedButton(
-                    onPressed: () {
-                      BlocProvider.of<DescriptionBloc>(context)
-                          .add(LoadDataMovie(id: id));
-                    },
-                    child: const Text("Thử lại"),
-                  )
-                ],
+            return Scaffold(
+              backgroundColor: Colors.black,
+              appBar: AppBar(
+                backgroundColor: Colors.black,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: Colors.redAccent,
+                        size: 56,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Không thể tải thông tin phim",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Dữ liệu phim đang được cập nhật hoặc kết nối mạng không ổn định.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[700],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 22, vertical: 11),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                        ),
+                        onPressed: () {
+                          BlocProvider.of<DescriptionBloc>(context)
+                              .add(LoadDataMovie(id: id));
+                        },
+                        icon: const Icon(Icons.refresh, size: 20),
+                        label: const Text(
+                          "Thử lại",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
             );
           }
+
+          final hasEpisodes = state.episodeList.isNotEmpty;
+          final isTrailerOnly = hasEpisodes &&
+              state.episodeList.length == 1 &&
+              state.episodeList.first.name.toLowerCase() == 'trailer';
+
           return ListView(
+            padding: EdgeInsets.zero,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +153,7 @@ class ScreenDescription extends StatelessWidget {
                         ? "Nội dung phim đang cập nhật..."
                         : state.overview,
                   ),
-                  if (state.episodeList.isNotEmpty) ...[
+                  if (hasEpisodes) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 10),
@@ -107,15 +161,22 @@ class ScreenDescription extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
-                          minimumSize: const Size(double.infinity, 45),
+                          minimumSize: const Size(double.infinity, 46),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(6)),
                         ),
-                        icon: const Icon(Icons.play_arrow, size: 28),
+                        icon: Icon(
+                          isTrailerOnly
+                              ? Icons.movie_creation_outlined
+                              : Icons.play_arrow,
+                          size: 28,
+                        ),
                         label: Text(
-                          state.episodeList.length > 1
-                              ? "Phát tập 1 (${state.episodeList.first.name})"
-                              : "Phát / Xem phim",
+                          isTrailerOnly
+                              ? "Xem Trailer giới thiệu"
+                              : (state.episodeList.length > 1
+                                  ? "Phát tập 1 (${state.episodeList.first.name})"
+                                  : "Phát / Xem phim"),
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
@@ -155,7 +216,10 @@ class ScreenDescription extends StatelessWidget {
                               backgroundColor: Colors.grey[850],
                               label: Text(
                                 ep.name,
-                                style: const TextStyle(color: Colors.white),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               onPressed: () {
                                 Navigator.push(
@@ -173,6 +237,60 @@ class ScreenDescription extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ] else ...[
+                    // When no playable episodes or trailer available yet
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.white12),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.access_time_rounded,
+                                color: Colors.amber,
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Phim đang cập nhật tập mới",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    "Tập phim đang được hệ thống đồng bộ. Bạn vui lòng quay lại sau ít phút!",
+                                    style: TextStyle(
+                                      color: Colors.white60,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                   kHeight20,
                 ],

@@ -30,6 +30,11 @@ class _ScreenWatchState extends State<ScreenWatch> {
       DeviceOrientation.portraitUp,
     ]);
 
+    String playUrl = widget.url.trim();
+    if (playUrl.contains('.m3u8') && !playUrl.contains('player')) {
+      playUrl = 'https://player.phimapi.com/player/?url=${Uri.encodeComponent(playUrl)}';
+    }
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.black)
@@ -47,7 +52,7 @@ class _ScreenWatchState extends State<ScreenWatch> {
           },
         ),
       )
-      ..loadRequest(Uri.parse(widget.url));
+      ..loadRequest(Uri.parse(playUrl));
   }
 
   @override
