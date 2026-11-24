@@ -19,36 +19,15 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Configure Flutter iOS and Install Pods
+      - name: Build iOS Release (No Codesign)
         run: |
           flutter pub get
-          flutter build ios --config-only --release --no-codesign
-          cd ios
-          pod install
-          cd ..
-
-      - name: Build with Xcode (No Code Signing)
-        run: |
-          set -o pipefail
-          xcodebuild -workspace ios/Runner.xcworkspace \
-                     -scheme Runner \
-                     -configuration Release \
-                     -sdk iphoneos \
-                     -destination generic/platform=iOS \
-                     -derivedDataPath build/ios_derived \
-                     CODE_SIGNING_ALLOWED=NO \
-                     CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGN_IDENTITY="" \
-                     EXPANDED_CODE_SIGN_IDENTITY="" \
-                     PROVISIONING_PROFILE_SPECIFIER="" \
-                     DEVELOPMENT_TEAM="" 2>&1 | tee xcodebuild.log || (echo "=== XCODEBUILD FAILED (LAST 100 LINES) ==="; tail -n 100 xcodebuild.log; exit 1)
+          flutter build ios --release --no-codesign --verbose
 
       - name: Package into IPA
         run: |
           mkdir -p build/ios/ipa/Payload
-          APP_PATH=$(find build/ios_derived/Build/Products -name "Runner.app" -type d | head -n 1)
-          echo "Found app at: $APP_PATH"
-          cp -r "$APP_PATH" build/ios/ipa/Payload/
+          cp -r build/ios/iphoneos/Runner.app build/ios/ipa/Payload/
           cd build/ios/ipa
           zip -r NetLich.ipa Payload
           cd ../../..
