@@ -21,8 +21,15 @@ jobs:
 
       - name: Build iOS Release (No Codesign)
         run: |
+          set -o pipefail
           flutter pub get
-          flutter build ios --release --no-codesign --verbose
+          flutter build ios --release --no-codesign --verbose 2>&1 | tee flutter_build.log || (
+            echo "## Build Failure Log" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            tail -n 120 flutter_build.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          )
 
       - name: Package into IPA
         run: |
@@ -38,3 +45,10 @@ jobs:
           name: NetLich-iOS-IPA
           path: build/ios/ipa/NetLich.ipa
           retention-days: 30
+
+      - name: Upload Build Log on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-build-log
+          path: flutter_build.log
