@@ -118,9 +118,9 @@ class _MainCardState extends State<MainCard> {
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               color: Colors.grey[900],
-                              child: const Column(
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
+                                children: const [
                                   Icon(Icons.movie_outlined,
                                       color: Colors.grey, size: 40),
                                   SizedBox(height: 6),

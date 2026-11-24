@@ -276,9 +276,9 @@ class _ScreenSearchState extends State<ScreenSearch> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.red, width: 0.8),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: [
+                            children: const [
                               Icon(Icons.close, size: 14, color: Colors.red),
                               SizedBox(width: 4),
                               Text(

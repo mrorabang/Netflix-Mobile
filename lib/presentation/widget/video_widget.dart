@@ -46,9 +46,9 @@ class VideoWidget extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey[900],
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           Icon(Icons.movie_outlined,
                               size: 48, color: Colors.grey),
                           SizedBox(height: 6),
