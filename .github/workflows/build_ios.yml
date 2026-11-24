@@ -8,15 +8,10 @@ on:
 jobs:
   build-ios:
     name: Build iOS IPA (NetLich)
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Select Xcode Version
-        run: |
-          sudo xcode-select -s /Applications/Xcode_15.2.app || sudo xcode-select -s /Applications/Xcode_15.0.1.app || sudo xcode-select -s /Applications/Xcode.app
-          xcodebuild -version
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
