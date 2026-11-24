@@ -1,0 +1,47 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build iOS IPA (NetLich)
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Flutter Dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: Build iOS Release (No Codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Package into IPA
+        run: |
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/ios/iphoneos/Runner.app build/ios/ipa/Payload/
+          cd build/ios/ipa
+          zip -r NetLich.ipa Payload
+          cd ../../..
+
+      - name: Upload NetLich.ipa Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetLich-iOS-IPA
+          path: build/ios/ipa/NetLich.ipa
+          retention-days: 30
