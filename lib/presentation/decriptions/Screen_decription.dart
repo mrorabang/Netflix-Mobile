@@ -291,11 +291,11 @@ class ScreenDescription extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(width: 12),
-                                    const Expanded(
+                                    Expanded(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-                                        children: [
+                                        children: const [
                                           Text(
                                             "Phim đang cập nhật tập mới",
                                             style: TextStyle(
@@ -493,10 +493,10 @@ class ScreenDescription extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
+                                children: const [
                                   Text(
                                     "Phim đang cập nhật tập mới",
                                     style: TextStyle(

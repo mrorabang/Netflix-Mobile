@@ -61,10 +61,10 @@ void showCastBottomSheet(BuildContext context) {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: const [
                         Text(
                           "Truyền tới thiết bị (Cast)",
                           style: TextStyle(
