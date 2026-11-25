@@ -119,7 +119,7 @@ class TopSearchItemTile extends StatelessWidget {
               height: imageHeight,
               child: SmoothNetworkImage(
                 imageUrl: imageUrl,
-                cacheWidth: 360,
+                cacheWidth: 650,
                 borderRadius: 8,
               ),
             ),

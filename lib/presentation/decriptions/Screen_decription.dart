@@ -46,7 +46,8 @@ class _ScreenDescriptionState extends State<ScreenDescription> {
             return _buildErrorView(context);
           }
 
-          final imageUrl = resolveImageUrl(state.posterPath, null);
+          final imageUrl =
+              upgradeToHighResPoster(resolveImageUrl(state.posterPath, null));
           final hasEpisodes = state.episodeList.isNotEmpty;
           final isTrailerOnly = hasEpisodes &&
               state.episodeList.length == 1 &&
@@ -103,7 +104,7 @@ class _ScreenDescriptionState extends State<ScreenDescription> {
                     children: [
                       SmoothNetworkImage(
                         imageUrl: imageUrl,
-                        cacheWidth: 900,
+                        cacheWidth: null,
                         alignment: Alignment.topCenter,
                       ),
                       const DecoratedBox(

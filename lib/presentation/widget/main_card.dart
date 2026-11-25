@@ -95,7 +95,7 @@ class _MainCardState extends State<MainCard> {
                     children: [
                       SmoothNetworkImage(
                         imageUrl: validImageUrl,
-                        cacheWidth: 360,
+                        cacheWidth: 650,
                       ),
                       const DecoratedBox(
                         decoration: BoxDecoration(

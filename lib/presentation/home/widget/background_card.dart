@@ -27,7 +27,7 @@ class BackgroundCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final poster = resolveImageUrl(imageUrl, null);
+    final poster = upgradeToHighResPoster(resolveImageUrl(imageUrl, null));
     final media = MediaQuery.of(context);
     final size = media.size;
     final isLandscape = size.width > size.height;
@@ -40,7 +40,7 @@ class BackgroundCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            SmoothNetworkImage(imageUrl: poster, cacheWidth: 1000),
+            SmoothNetworkImage(imageUrl: poster, cacheWidth: null),
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -139,7 +139,7 @@ class BackgroundCard extends StatelessWidget {
                   children: [
                     SmoothNetworkImage(
                       imageUrl: poster,
-                      cacheWidth: 900,
+                      cacheWidth: null,
                       alignment: Alignment.topCenter,
                     ),
                     const DecoratedBox(

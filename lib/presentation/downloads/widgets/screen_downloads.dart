@@ -322,7 +322,7 @@ class _FanPosterCard extends StatelessWidget {
       ),
       child: SmoothNetworkImage(
         imageUrl: imageUrl,
-        cacheWidth: 380,
+        cacheWidth: 650,
         borderRadius: 11,
       ),
     );

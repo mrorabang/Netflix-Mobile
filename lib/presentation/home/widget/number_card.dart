@@ -62,7 +62,7 @@ class NumberCard extends StatelessWidget {
                   ),
                   child: SmoothNetworkImage(
                     imageUrl: validUrl,
-                    cacheWidth: 360,
+                    cacheWidth: 650,
                     borderRadius: 9,
                   ),
                 ),

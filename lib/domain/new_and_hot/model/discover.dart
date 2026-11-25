@@ -69,12 +69,15 @@ class HotAndNewData {
 
   factory HotAndNewData.fromApiJson(Map<String, dynamic> json, [String? cdn]) {
     final poster = resolveImageUrl(json['poster_url'], json['thumb_url'], cdn);
+    final backdrop =
+        resolveBackdropUrl(json['poster_url'], json['thumb_url'], cdn);
     return HotAndNewData(
       id: json['slug']?.toString() ?? json['_id']?.toString() ?? '',
       title: json['name'] as String? ?? json['title'] as String? ?? '',
-      originalTitle: json['origin_name'] as String? ?? json['name'] as String? ?? '',
+      originalTitle:
+          json['origin_name'] as String? ?? json['name'] as String? ?? '',
       posterPath: poster,
-      backdropPath: poster,
+      backdropPath: backdrop,
       overview: json['content'] as String? ?? '',
       releaseDate: json['year']?.toString() ?? '',
     );

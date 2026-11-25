@@ -17,6 +17,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:netflix_clone/core/constants.dart';
 
 /// Hành vi cuộn toàn cục: áp dụng hiệu ứng cuộn đàn hồi mượt mà cho cả danh sách dọc và ngang,
 /// đồng thời cho phép kéo bằng cảm ứng hoặc chuột trên mọi nền tảng.
@@ -287,9 +288,9 @@ class _ShimmerBoxState extends State<ShimmerBox>
   }
 }
 
-/// Tải và hiển thị ảnh mạng mượt mà với giải mã kích thước hợp lý (cacheWidth)
-/// giúp giảm mạnh lượng RAM GPU tiêu thụ khi cuộn nhanh danh sách nhiều poster.
-class SmoothNetworkImage extends StatelessWidget {
+/// Tải và hiển thị ảnh mạng chuẩn HD với bộ lọc mipmap (FilterQuality.medium)
+/// và cơ chế tự động fallback về URL gốc nếu link CDN TMDB không tìm thấy ảnh.
+class SmoothNetworkImage extends StatefulWidget {
   final String imageUrl;
   final BoxFit fit;
   final int? cacheWidth;
@@ -300,26 +301,46 @@ class SmoothNetworkImage extends StatelessWidget {
     super.key,
     required this.imageUrl,
     this.fit = BoxFit.cover,
-    this.cacheWidth = 420,
+    this.cacheWidth = 700,
     this.borderRadius = 0,
     this.alignment = Alignment.center,
   });
 
   @override
+  State<SmoothNetworkImage> createState() => _SmoothNetworkImageState();
+}
+
+class _SmoothNetworkImageState extends State<SmoothNetworkImage> {
+  bool _useFallback = false;
+
+  @override
+  void didUpdateWidget(covariant SmoothNetworkImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl) {
+      _useFallback = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final fallbackUrl = getTmdbFallbackUrl(widget.imageUrl);
+    final activeUrl = (_useFallback && fallbackUrl != null)
+        ? fallbackUrl
+        : widget.imageUrl;
+
     Widget content = Container(
       color: const Color(0xFF141418),
       child: Image.network(
-        imageUrl,
-        fit: fit,
-        alignment: alignment,
-        cacheWidth: cacheWidth,
-        filterQuality: FilterQuality.low,
+        activeUrl,
+        fit: widget.fit,
+        alignment: widget.alignment,
+        cacheWidth: widget.cacheWidth,
+        filterQuality: FilterQuality.medium,
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
           if (wasSynchronouslyLoaded) return child;
           return AnimatedOpacity(
             opacity: frame == null ? 0.0 : 1.0,
-            duration: const Duration(milliseconds: 260),
+            duration: const Duration(milliseconds: 240),
             curve: Curves.easeOut,
             child: child,
           );
@@ -335,6 +356,14 @@ class SmoothNetworkImage extends StatelessWidget {
           );
         },
         errorBuilder: (context, error, stackTrace) {
+          if (!_useFallback && fallbackUrl != null && fallbackUrl != activeUrl) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() => _useFallback = true);
+              }
+            });
+            return const ShimmerBox(borderRadius: 0);
+          }
           return Container(
             color: const Color(0xFF18181E),
             alignment: Alignment.center,
@@ -364,9 +393,9 @@ class SmoothNetworkImage extends StatelessWidget {
       ),
     );
 
-    if (borderRadius > 0) {
+    if (widget.borderRadius > 0) {
       content = ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(widget.borderRadius),
         child: content,
       );
     }

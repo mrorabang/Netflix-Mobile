@@ -758,7 +758,7 @@ class _CategoryMovieCardState extends State<_CategoryMovieCard> {
                   children: [
                     SmoothNetworkImage(
                       imageUrl: movie.posterUrl,
-                      cacheWidth: 360,
+                      cacheWidth: 650,
                     ),
                     if (movie.quality != null && movie.quality!.isNotEmpty)
                       Positioned(

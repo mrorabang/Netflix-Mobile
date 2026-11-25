@@ -29,7 +29,7 @@ class VideoWidget extends StatelessWidget {
             children: [
               SmoothNetworkImage(
                 imageUrl: validUrl,
-                cacheWidth: 780,
+                cacheWidth: null,
               ),
               const DecoratedBox(
                 decoration: BoxDecoration(

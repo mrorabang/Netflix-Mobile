@@ -183,7 +183,7 @@ class _SearchResultCardState extends State<SearchResultCard> {
                   children: [
                     SmoothNetworkImage(
                       imageUrl: widget.imageUrl,
-                      cacheWidth: 360,
+                      cacheWidth: 650,
                     ),
                     if (widget.quality != null && widget.quality!.isNotEmpty)
                       Positioned(
