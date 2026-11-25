@@ -6,9 +6,15 @@ import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
 import 'package:netflix_clone/presentation/decriptions/Screen_decription.dart';
 import 'package:netflix_clone/presentation/search/widget/search_title.dart';
+import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 
 class SearchIdelWidget extends StatelessWidget {
-  const SearchIdelWidget({Key? key}) : super(key: key);
+  final double bottomPadding;
+
+  const SearchIdelWidget({
+    Key? key,
+    this.bottomPadding = 20,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,19 +24,39 @@ class SearchIdelWidget extends StatelessWidget {
         const SearchTitleText(
           title: "Tìm Kiếm Hàng Đầu",
         ),
-        kHeight20,
+        const SizedBox(height: 12),
         Expanded(
           child: BlocBuilder<SearchBloc, SearchState>(
             builder: (context, state) {
               if (state.isLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return ListView.separated(
+                  padding: EdgeInsets.only(bottom: bottomPadding),
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: 6,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (_, __) => const ShimmerBox(
+                    height: 76,
+                    borderRadius: 12,
+                  ),
+                );
               } else if (state.isError) {
-                return const Center(child: Text("Lỗi khi tải dữ liệu"));
+                return const Center(
+                  child: Text(
+                    "Lỗi khi tải xu hướng tìm kiếm",
+                    style: TextStyle(color: kGray),
+                  ),
+                );
               } else if (state.ideleList.isEmpty) {
-                return const Center(child: Text("Danh sách trống"));
+                return const Center(
+                  child: Text(
+                    "Danh sách đang cập nhật",
+                    style: TextStyle(color: kGray),
+                  ),
+                );
               }
               return ListView.separated(
-                shrinkWrap: true,
+                padding: EdgeInsets.only(bottom: bottomPadding),
+                cacheExtent: 600,
                 itemBuilder: (ctx, index) {
                   final movie = state.ideleList[index];
                   return TopSearchItemTile(
@@ -39,12 +65,12 @@ class SearchIdelWidget extends StatelessWidget {
                     imageUrl: resolveImageUrl(movie.posterPath, null),
                   );
                 },
-                separatorBuilder: (ctx, index) => kHeight20,
+                separatorBuilder: (ctx, index) => const SizedBox(height: 10),
                 itemCount: state.ideleList.length,
               );
             },
           ),
-        )
+        ),
       ],
     );
   }
@@ -66,62 +92,68 @@ class TopSearchItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenwidth = MediaQuery.of(context).size.width;
     final isLandscape = screenwidth > MediaQuery.of(context).size.height;
-    final imageWidth = isLandscape ? 150.0 : screenwidth * 0.35;
-    final imageHeight = isLandscape ? 84.0 : 72.0;
+    final imageWidth = isLandscape ? 146.0 : screenwidth * 0.33;
+    final imageHeight = isLandscape ? 82.0 : 72.0;
 
-    return InkWell(
+    return ScaleTap(
+      pressedScale: 0.97,
       onTap: () {
         if (id.isNotEmpty) {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (ctx) => ScreenDescription(id: id),
-            ),
+            netflixRoute(ScreenDescription(id: id)),
           );
         }
       },
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: Container(
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: kSurfaceColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0x14FFFFFF), width: 0.7),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
               width: imageWidth,
               height: imageHeight,
-              color: Colors.grey[900],
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (ctx, err, stack) => Container(
-                  color: Colors.grey[900],
-                  child: const Icon(Icons.movie, color: Colors.grey),
+              child: SmoothNetworkImage(
+                imageUrl: imageUrl,
+                cacheWidth: 360,
+                borderRadius: 8,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  color: Colors.white,
                 ),
               ),
             ),
-          ),
-          kWidth,
-          Expanded(
-            child: Text(
-              title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-          ),
-          kWidth,
-          const CircleAvatar(
-            backgroundColor: kwhiteColor,
-            radius: 20,
-            child: CircleAvatar(
-              backgroundColor: kBlackColor,
-              radius: 18,
-              child: Icon(
+            const SizedBox(width: 8),
+            Container(
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.only(right: 4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                    color: const Color(0x66FFFFFF), width: 1.4),
+              ),
+              child: const Icon(
                 CupertinoIcons.play_fill,
-                color: kwhiteColor,
-                size: 18,
+                color: Colors.white,
+                size: 16,
               ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

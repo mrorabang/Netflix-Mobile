@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:netflix_clone/core/colors/colors.dart';
+import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
@@ -21,17 +24,21 @@ class ScreenWatch extends StatefulWidget {
 class _ScreenWatchState extends State<ScreenWatch> {
   late final WebViewController _controller;
   bool _isLoading = true;
+  bool _showControls = true;
+  Timer? _hideTimer;
   final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    // Allow landscape rotation for movie watching
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
     ]);
+
+    _scheduleHideControls();
 
     String playUrl = widget.url.trim();
     if (playUrl.contains('.m3u8') && !playUrl.contains('player')) {
@@ -85,6 +92,22 @@ class _ScreenWatchState extends State<ScreenWatch> {
     });
   }
 
+  void _scheduleHideControls() {
+    _hideTimer?.cancel();
+    _hideTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted && !_isLoading) {
+        setState(() => _showControls = false);
+      }
+    });
+  }
+
+  void _revealControlsTemporarily() {
+    if (!_showControls) {
+      setState(() => _showControls = true);
+    }
+    _scheduleHideControls();
+  }
+
   void _injectAutoPlay() {
     const js = '''
       (function() {
@@ -134,6 +157,7 @@ class _ScreenWatchState extends State<ScreenWatch> {
   }
 
   void _togglePlayPause() {
+    _revealControlsTemporarily();
     const js = '''
       (function() {
         try {
@@ -155,6 +179,7 @@ class _ScreenWatchState extends State<ScreenWatch> {
   }
 
   void _seekRelative(int seconds) {
+    _revealControlsTemporarily();
     final js = '''
       (function() {
         try {
@@ -196,8 +221,9 @@ class _ScreenWatchState extends State<ScreenWatch> {
 
   @override
   void dispose() {
+    _hideTimer?.cancel();
     _focusNode.dispose();
-    // Restore orientation support
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
@@ -221,60 +247,84 @@ class _ScreenWatchState extends State<ScreenWatch> {
         onKeyEvent: _handleKeyEvent,
         child: Scaffold(
           backgroundColor: Colors.black,
-          body: SafeArea(
+          body: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) => _revealControlsTemporarily(),
             child: Stack(
               children: [
                 Positioned.fill(
                   child: WebViewWidget(controller: _controller),
                 ),
-                // Top overlay with back button and movie title
                 Positioned(
                   top: 0,
                   left: 0,
                   right: 0,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.black87, Colors.transparent],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.white, size: 26),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            widget.title,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black,
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                  child: IgnorePointer(
+                    ignoring: !_showControls,
+                    child: AnimatedOpacity(
+                      opacity: _showControls ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 260),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xD9000000), Colors.transparent],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
                           ),
                         ),
-                      ],
+                        padding: EdgeInsets.fromLTRB(
+                          12,
+                          MediaQuery.of(context).padding.top + 6,
+                          16,
+                          16,
+                        ),
+                        child: Row(
+                          children: [
+                            ScaleTap(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                decoration: const BoxDecoration(
+                                  color: Color(0x80000000),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                widget.title,
+                                style: const TextStyle(
+                                  fontSize: 15.5,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 6,
+                                    ),
+                                  ],
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 if (_isLoading)
                   const Center(
                     child: CircularProgressIndicator(
-                      color: Colors.red,
+                      color: kNetflixRed,
+                      strokeWidth: 2.5,
                     ),
                   ),
               ],

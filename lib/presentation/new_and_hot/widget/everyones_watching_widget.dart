@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
-import 'package:netflix_clone/core/constants.dart';
 import 'package:netflix_clone/presentation/decriptions/Screen_decription.dart';
+import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../home/widget/custom_button_widget.dart';
 import '../../widget/video_widget.dart';
 
@@ -23,17 +24,21 @@ class EveryOnesWatchingWidget extends StatelessWidget {
     if (id.isNotEmpty) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (ctx) => ScreenDescription(id: id),
-        ),
+        netflixRoute(ScreenDescription(id: id)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: kSurfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x18FFFFFF), width: 0.8),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -52,82 +57,103 @@ class EveryOnesWatchingWidget extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 17.5,
+                      fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              const CustomButtonWidget(
-                icon: Icons.share,
-                title: "Chia sẻ",
-                iconSize: 22,
-                textSize: 11,
+              ScaleTap(
+                onTap: () {
+                  Share.share(
+                    'Xem ngay "$movieName" đang cực hot trên Nét Lích!',
+                  );
+                },
+                child: const CustomButtonWidget(
+                  icon: Icons.share_outlined,
+                  title: "Chia sẻ",
+                  iconSize: 21,
+                  textSize: 10.5,
+                ),
               ),
               const SizedBox(width: 14),
-              const CustomButtonWidget(
-                icon: Icons.add,
-                title: "Danh sách",
-                iconSize: 22,
-                textSize: 11,
+              ValueListenableBuilder<Set<String>>(
+                valueListenable: MyListStore.savedIds,
+                builder: (context, savedSet, _) {
+                  final saved = savedSet.contains(id);
+                  return ScaleTap(
+                    enableHaptic: false,
+                    onTap: () => MyListStore.toggleSaved(
+                      context,
+                      id,
+                      title: movieName,
+                    ),
+                    child: CustomButtonWidget(
+                      icon: saved ? Icons.check_rounded : Icons.add_rounded,
+                      title: saved ? "Đã lưu" : "Danh sách",
+                      iconSize: 22,
+                      textSize: 10.5,
+                    ),
+                  );
+                },
               ),
               const SizedBox(width: 14),
-              GestureDetector(
+              ScaleTap(
                 onTap: () => _navigateToDetail(context),
                 child: const CustomButtonWidget(
-                  icon: Icons.play_arrow,
+                  icon: Icons.play_arrow_rounded,
                   title: "Phát",
-                  iconSize: 24,
-                  textSize: 11,
+                  iconSize: 23,
+                  textSize: 10.5,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 9),
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white30, width: 0.8),
-                  borderRadius: BorderRadius.circular(3),
+                  border:
+                      Border.all(color: const Color(0x4DFFFFFF), width: 0.8),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text(
-                  "HD",
+                  "FHD",
                   style: TextStyle(
                     fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                     color: Colors.white70,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               const Text(
-                "Đang thịnh hành nhất",
+                "🔥 Đang thịnh hành nhất",
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.red,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFFFF5252),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 7),
           Text(
             decription.isNotEmpty
                 ? decription
                 : "Phim đang nhận được nhiều sự quan tâm từ khán giả với nội dung lôi cuốn, kịch tính và hấp dẫn từng khoảnh khắc.",
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.grey[400],
+            style: const TextStyle(
+              color: kGray,
               fontSize: 13,
-              height: 1.4,
+              height: 1.42,
             ),
           ),
-          const SizedBox(height: 8),
         ],
       ),
     );

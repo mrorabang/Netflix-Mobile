@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:netflix_clone/core/constants.dart';
 import 'package:netflix_clone/presentation/widget/main_card.dart';
 import 'package:netflix_clone/presentation/widget/main_title.dart';
 
@@ -21,19 +20,20 @@ class MainTitleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (posterList.isEmpty) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           child: MainTitle(title: title),
         ),
-        kHeight,
-        LimitedBox(
-          maxHeight: 250,
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 214,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 9),
             itemCount: posterList.length,
             itemBuilder: (context, index) {
               final movieId =
@@ -55,7 +55,7 @@ class MainTitleCard extends StatelessWidget {
               );
             },
           ),
-        )
+        ),
       ],
     );
   }

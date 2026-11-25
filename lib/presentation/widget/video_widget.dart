@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
+import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 
 class VideoWidget extends StatelessWidget {
   const VideoWidget({
@@ -16,84 +16,49 @@ class VideoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final validUrl = resolveImageUrl(imageUrl, null);
 
-    return GestureDetector(
+    return ScaleTap(
+      pressedScale: 0.98,
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
+        borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
           width: double.infinity,
-          height: 200,
-          color: Colors.grey[900],
+          height: 196,
           child: Stack(
+            fit: StackFit.expand,
             children: [
-              Positioned.fill(
-                child: Image.network(
-                  validUrl,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return Center(
-                      child: SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.red[700],
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[900],
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.movie_outlined,
-                              size: 48, color: Colors.grey),
-                          SizedBox(height: 6),
-                          Text(
-                            "Netflix",
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+              SmoothNetworkImage(
+                imageUrl: validUrl,
+                cacheWidth: 780,
               ),
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.4),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0x14000000),
+                      Color(0x8C000000),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
               ),
-              Positioned(
-                bottom: 10,
-                right: 10,
-                child: CircleAvatar(
-                  backgroundColor: Colors.black54,
-                  radius: 18,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: onTap,
-                    icon: const Icon(
-                      Icons.volume_off,
-                      color: kwhiteColor,
-                      size: 18,
+              Center(
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0x99000000),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0x80FFFFFF),
+                      width: 1.4,
                     ),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.white,
+                    size: 30,
                   ),
                 ),
               ),

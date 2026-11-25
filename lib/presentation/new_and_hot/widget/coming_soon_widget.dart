@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/presentation/decriptions/Screen_decription.dart';
+import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 import '../../home/widget/custom_button_widget.dart';
 import '../../widget/video_widget.dart';
 
@@ -20,7 +21,7 @@ class ComingSoonWidget extends StatelessWidget {
     this.month = '',
     this.day = '',
     this.year,
-    this.releaseInfo = 'Sắp ra mắt trên Netflix',
+    this.releaseInfo = 'Sắp ra mắt trên Nét Lích',
     required this.posterPath,
     required this.movieName,
     required this.decription,
@@ -33,16 +34,14 @@ class ComingSoonWidget extends StatelessWidget {
     if (day.trim().isNotEmpty && day != '2024') {
       return day.trim();
     }
-    return '2024';
+    return '2026';
   }
 
   void _navigateToDetail(BuildContext context) {
     if (id.isNotEmpty) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (ctx) => ScreenDescription(id: id),
-        ),
+        netflixRoute(ScreenDescription(id: id)),
       );
     }
   }
@@ -51,19 +50,23 @@ class ComingSoonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final yearText = displayYear;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: kSurfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x18FFFFFF), width: 0.8),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Full-width Video / Poster preview with badges
           Stack(
             children: [
               VideoWidget(
                 imageUrl: posterPath,
                 onTap: () => _navigateToDetail(context),
               ),
-              // Floating Year badge on top-left of poster
               Positioned(
                 top: 10,
                 left: 10,
@@ -71,9 +74,10 @@ class ComingSoonWidget extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.75),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: Colors.white24, width: 0.8),
+                    color: const Color(0xCC0A0A0E),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                        color: const Color(0x33FFFFFF), width: 0.8),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -81,16 +85,15 @@ class ComingSoonWidget extends StatelessWidget {
                       const Icon(
                         Icons.calendar_month_outlined,
                         size: 13,
-                        color: Colors.redAccent,
+                        color: kNetflixRed,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         yearText,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -100,7 +103,6 @@ class ComingSoonWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Title and action buttons row
           Row(
             children: [
               Expanded(
@@ -111,92 +113,92 @@ class ComingSoonWidget extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 17.5,
+                      fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              const CustomButtonWidget(
-                icon: Icons.notifications_none,
-                title: "Nhắc tôi",
-                iconSize: 22,
-                textSize: 11,
+              ValueListenableBuilder<Set<String>>(
+                valueListenable: MyListStore.reminderIds,
+                builder: (context, remindedSet, _) {
+                  final reminded = remindedSet.contains(id);
+                  return ScaleTap(
+                    enableHaptic: false,
+                    onTap: () => MyListStore.toggleReminder(
+                      context,
+                      id,
+                      title: movieName,
+                    ),
+                    child: CustomButtonWidget(
+                      icon: reminded
+                          ? Icons.notifications_active_rounded
+                          : Icons.notifications_none_rounded,
+                      title: reminded ? "Đã nhắc" : "Nhắc tôi",
+                      iconSize: 21,
+                      textSize: 10.5,
+                    ),
+                  );
+                },
               ),
               const SizedBox(width: 14),
-              GestureDetector(
+              ScaleTap(
                 onTap: () => _navigateToDetail(context),
                 child: const CustomButtonWidget(
-                  icon: Icons.info_outline,
+                  icon: Icons.info_outline_rounded,
                   title: "Chi tiết",
-                  iconSize: 22,
-                  textSize: 11,
+                  iconSize: 21,
+                  textSize: 10.5,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          // Badges row: Year badge + Status badge
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.white12,
-                  borderRadius: BorderRadius.circular(3),
-                  border: Border.all(color: Colors.white30, width: 0.8),
-                ),
-                child: Text(
-                  yearText,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white70,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(3),
+                  color: const Color(0x26E50914),
+                  borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                      color: Colors.red.withOpacity(0.5), width: 0.8),
+                      color: const Color(0x66E50914), width: 0.8),
                 ),
                 child: const Text(
                   "Sắp Chiếu",
                   style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.redAccent,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFFF6B6B),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
               Text(
                 releaseInfo,
-                style: TextStyle(
-                  fontSize: 13,
+                style: const TextStyle(
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white.withOpacity(0.85),
+                  color: Color(0xFFD8D8E4),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           Text(
             decription.isNotEmpty
                 ? decription
-                : "Bộ phim hấp dẫn sắp có mặt trên Netflix. Hãy cùng đón xem những tình tiết bất ngờ và kịch tính nhất!",
+                : "Bộ phim hấp dẫn sắp có mặt trên Nét Lích. Hãy cùng đón xem những tình tiết bất ngờ và kịch tính nhất!",
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.grey[400],
+            style: const TextStyle(
+              color: kGray,
               fontSize: 13,
-              height: 1.4,
+              height: 1.42,
             ),
           ),
         ],

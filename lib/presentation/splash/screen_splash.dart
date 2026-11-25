@@ -1,29 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/presentation/main_page/widgets/screen_main_page.dart';
 
 class ScreenSplash extends StatefulWidget {
   const ScreenSplash({Key? key}) : super(key: key);
 
   @override
-  _ScreenSplashState createState() => _ScreenSplashState();
+  State<ScreenSplash> createState() => _ScreenSplashState();
 }
 
 class _ScreenSplashState extends State<ScreenSplash> {
   @override
   void initState() {
     super.initState();
-    navigatorHome();
+    _navigateHome();
   }
 
-  navigatorHome() async {
-    await Future.delayed(
-      const Duration(milliseconds: 2200),
-    );
+  Future<void> _navigateHome() async {
+    await Future.delayed(const Duration(milliseconds: 2000));
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (ctx) => ScreenMainPage(),
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 520),
+        pageBuilder: (_, __, ___) => const ScreenMainPage(),
+        transitionsBuilder: (_, animation, __, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          return FadeTransition(opacity: curved, child: child);
+        },
       ),
     );
   }
@@ -31,12 +38,12 @@ class _ScreenSplashState extends State<ScreenSplash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Center(
-            child: Lottie.asset("assets/splashLogo/data.json"),
-          ),
-        ],
+      backgroundColor: backgrounndColor,
+      body: Center(
+        child: Lottie.asset(
+          "assets/splashLogo/data.json",
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
