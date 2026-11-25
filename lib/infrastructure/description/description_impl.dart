@@ -6,6 +6,7 @@ import 'package:netflix_clone/domain/core/api_end_points.dart';
 import 'package:netflix_clone/domain/core/failures/main_failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:netflix_clone/domain/description/model/description_resp/description_resp.dart';
+import 'package:netflix_clone/infrastructure/tmdb/tmdb_4k_service.dart';
 import '../../domain/description/description_service.dart';
 
 @LazySingleton(as: DescriptionService)
@@ -44,6 +45,18 @@ class DescriptionMovie implements DescriptionService {
             if (result.title != null && result.title!.isNotEmpty) {
               // If this source has playable episodes, return it immediately!
               if (result.episodeList.isNotEmpty) {
+                final tmdb4k = await Tmdb4kService.fetch4kForSlug(
+                  cleanId,
+                  fallbackTitle: result.originalTitle?.isNotEmpty == true
+                      ? result.originalTitle
+                      : result.title,
+                );
+                if (tmdb4k != null) {
+                  result.backdropPath =
+                      tmdb4k.backdrop4kUrl ?? result.backdropPath;
+                  result.posterPath =
+                      tmdb4k.backdrop4kUrl ?? tmdb4k.poster4kUrl ?? result.posterPath;
+                }
                 return Right(result);
               }
               candidateResp ??= result;
@@ -56,6 +69,19 @@ class DescriptionMovie implements DescriptionService {
     }
 
     if (candidateResp != null) {
+      final tmdb4k = await Tmdb4kService.fetch4kForSlug(
+        cleanId,
+        fallbackTitle: candidateResp.originalTitle?.isNotEmpty == true
+            ? candidateResp.originalTitle
+            : candidateResp.title,
+      );
+      if (tmdb4k != null) {
+        candidateResp.backdropPath =
+            tmdb4k.backdrop4kUrl ?? candidateResp.backdropPath;
+        candidateResp.posterPath = tmdb4k.backdrop4kUrl ??
+            tmdb4k.poster4kUrl ??
+            candidateResp.posterPath;
+      }
       return Right(candidateResp);
     }
     return const Left(MainFailure.serverFailure());

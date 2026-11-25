@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:netflix_clone/application/description/description_bloc.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
+import 'package:netflix_clone/infrastructure/tmdb/tmdb_4k_service.dart';
 import 'package:netflix_clone/presentation/watch/screen_watch.dart';
 import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 import 'package:share_plus/share_plus.dart';
@@ -46,7 +47,9 @@ class _ScreenDescriptionState extends State<ScreenDescription> {
             return _buildErrorView(context);
           }
 
-          final imageUrl =
+          final tmdb4k = Tmdb4kService.getCached(widget.id);
+          final imageUrl = tmdb4k?.backdrop4kUrl ??
+              tmdb4k?.poster4kUrl ??
               upgradeToHighResPoster(resolveImageUrl(state.posterPath, null));
           final hasEpisodes = state.episodeList.isNotEmpty;
           final isTrailerOnly = hasEpisodes &&
@@ -105,7 +108,8 @@ class _ScreenDescriptionState extends State<ScreenDescription> {
                       SmoothNetworkImage(
                         imageUrl: imageUrl,
                         cacheWidth: null,
-                        alignment: Alignment.topCenter,
+                        filterQuality: FilterQuality.high,
+                        alignment: Alignment.center,
                       ),
                       const DecoratedBox(
                         decoration: BoxDecoration(
@@ -158,6 +162,27 @@ class _ScreenDescriptionState extends State<ScreenDescription> {
                             ),
                           ),
                           const RoundText(text: "16+"),
+                          if (tmdb4k?.hasAnyHighRes == true)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 3.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0x26FBBF24),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: const Color(0x99FBBF24),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: const Text(
+                                "4K ULTRA HD",
+                                style: TextStyle(
+                                  color: Color(0xFFFBBF24),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
                           RoundText(
                             text: state.status.isEmpty ? "FHD" : state.status,
                           ),

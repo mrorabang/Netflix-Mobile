@@ -65,6 +65,8 @@ class ComingSoonWidget extends StatelessWidget {
             children: [
               VideoWidget(
                 imageUrl: posterPath,
+                movieId: id,
+                movieTitle: movieName,
                 onTap: () => _navigateToDetail(context),
               ),
               Positioned(

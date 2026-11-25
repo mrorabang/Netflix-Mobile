@@ -296,6 +296,7 @@ class SmoothNetworkImage extends StatefulWidget {
   final int? cacheWidth;
   final double borderRadius;
   final Alignment alignment;
+  final FilterQuality filterQuality;
 
   const SmoothNetworkImage({
     super.key,
@@ -304,6 +305,7 @@ class SmoothNetworkImage extends StatefulWidget {
     this.cacheWidth = 700,
     this.borderRadius = 0,
     this.alignment = Alignment.center,
+    this.filterQuality = FilterQuality.medium,
   });
 
   @override
@@ -335,7 +337,7 @@ class _SmoothNetworkImageState extends State<SmoothNetworkImage> {
         fit: widget.fit,
         alignment: widget.alignment,
         cacheWidth: widget.cacheWidth,
-        filterQuality: FilterQuality.medium,
+        filterQuality: widget.filterQuality,
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
           if (wasSynchronouslyLoaded) return child;
           return AnimatedOpacity(

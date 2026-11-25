@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:netflix_clone/infrastructure/tmdb/tmdb_4k_service.dart';
 import '../../../../core/constants.dart';
 
 part 'description_resp.g.dart';
@@ -99,6 +100,9 @@ class DescriptionResp {
     final movie = (json['movie'] as Map<String, dynamic>?) ??
         (json['data'] is Map ? (json['data']['item'] as Map<String, dynamic>?) : null) ??
         {};
+    if (movie.isNotEmpty) {
+      Tmdb4kService.registerFromApiJson(movie);
+    }
     final episodesRaw = (json['episodes'] as List?) ??
         (json['data'] is Map ? (json['data']['episodes'] as List?) : null) ??
         [];

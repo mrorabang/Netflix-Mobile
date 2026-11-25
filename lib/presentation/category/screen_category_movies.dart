@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
 import 'package:netflix_clone/core/strings.dart';
+import 'package:netflix_clone/infrastructure/tmdb/tmdb_4k_service.dart';
 import 'package:netflix_clone/presentation/decriptions/Screen_decription.dart';
 import 'package:netflix_clone/presentation/search/screen_search.dart';
 import 'package:netflix_clone/presentation/widgets/cast_modal.dart';
@@ -94,6 +95,7 @@ class CategoryMovieItem {
   });
 
   factory CategoryMovieItem.fromJson(Map<String, dynamic> json, [String? cdn]) {
+    Tmdb4kService.registerFromApiJson(json);
     final poster = resolveImageUrl(json['poster_url'], json['thumb_url'], cdn);
     return CategoryMovieItem(
       id: json['slug']?.toString() ?? json['_id']?.toString() ?? '',

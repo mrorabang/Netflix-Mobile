@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:netflix_clone/infrastructure/tmdb/tmdb_4k_service.dart';
 import '../../../../core/constants.dart';
 
 part 'discover.g.dart';
@@ -68,6 +69,7 @@ class HotAndNewData {
   }
 
   factory HotAndNewData.fromApiJson(Map<String, dynamic> json, [String? cdn]) {
+    Tmdb4kService.registerFromApiJson(json);
     final poster = resolveImageUrl(json['poster_url'], json['thumb_url'], cdn);
     final backdrop =
         resolveBackdropUrl(json['poster_url'], json['thumb_url'], cdn);

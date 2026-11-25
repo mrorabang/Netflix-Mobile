@@ -44,6 +44,8 @@ class EveryOnesWatchingWidget extends StatelessWidget {
         children: [
           VideoWidget(
             imageUrl: posterPath,
+            movieId: id,
+            movieTitle: movieName,
             onTap: () => _navigateToDetail(context),
           ),
           const SizedBox(height: 12),

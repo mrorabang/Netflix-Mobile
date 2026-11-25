@@ -194,6 +194,7 @@ class _ScreenHomeState extends State<ScreenHome> {
                         imageUrl: heroMovie?.posterPath,
                         title: heroMovie?.title,
                         movieId: heroMovie?.id,
+                        heroMovies: state.trendingMovieList.take(6).toList(),
                       ),
                       const SizedBox(height: 18),
                       MainTitleCard(
