@@ -18,7 +18,13 @@
 
 import 'dart:developer';
 import 'package:dio/dio.dart';
-import 'package:netflix_clone/infrastructure/api_key.dart';
+
+/// Khóa TMDB dùng chung (hỗ trợ ghi đè qua `--dart-define=TMDB_API_KEY=...` trên CI nếu cần,
+/// không phụ thuộc vào file `api_key.dart` đang nằm trong `.gitignore`).
+const String _kTmdbApiKey = String.fromEnvironment(
+  'TMDB_API_KEY',
+  defaultValue: '2155956beab817303ff7118a5497f466',
+);
 
 class TmdbMovieHint {
   final String slug;
@@ -210,7 +216,7 @@ class Tmdb4kService {
       final resp = await _dio.get(
         '/search/multi',
         queryParameters: {
-          'api_key': apiKey,
+          'api_key': _kTmdbApiKey,
           'query': query,
           'include_adult': false,
         },
@@ -241,7 +247,7 @@ class Tmdb4kService {
       final resp = await _dio.get(
         '/$type/$id/images',
         queryParameters: {
-          'api_key': apiKey,
+          'api_key': _kTmdbApiKey,
           'include_image_language': 'vi,en,null',
         },
       );
