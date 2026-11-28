@@ -549,7 +549,9 @@ class _ScreenCategoryMoviesState extends State<ScreenCategoryMovies> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return ScaleTap(
+      showFocusRing: true,
+      focusBorderRadius: 22,
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -923,7 +925,10 @@ void showTheLoaiBottomSheet(
                   final name = entry.value;
                   final isSelected = slug == currentSlug;
 
-                  return GestureDetector(
+                  return ScaleTap(
+                    autofocus: index == 0,
+                    showFocusRing: true,
+                    focusBorderRadius: 10,
                     onTap: () {
                       Navigator.pop(ctx);
                       if (onSelected != null) {
@@ -931,8 +936,8 @@ void showTheLoaiBottomSheet(
                       } else {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => ScreenCategoryMovies(
+                          netflixRoute(
+                            ScreenCategoryMovies(
                               initialTitle: name,
                               type: CategoryType.theLoai,
                               initialSlug: slug,
@@ -1053,7 +1058,10 @@ void showQuocGiaBottomSheet(
                   final name = entry.value;
                   final isSelected = slug == currentSlug;
 
-                  return GestureDetector(
+                  return ScaleTap(
+                    autofocus: index == 0,
+                    showFocusRing: true,
+                    focusBorderRadius: 10,
                     onTap: () {
                       Navigator.pop(ctx);
                       if (onSelected != null) {
@@ -1061,8 +1069,8 @@ void showQuocGiaBottomSheet(
                       } else {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => ScreenCategoryMovies(
+                          netflixRoute(
+                            ScreenCategoryMovies(
                               initialTitle: "Phim $name",
                               type: CategoryType.quocGia,
                               initialSlug: slug,

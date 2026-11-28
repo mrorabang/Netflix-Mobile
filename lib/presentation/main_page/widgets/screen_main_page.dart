@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:netflix_clone/application/downloads/downloads_bloc.dart';
 import 'package:netflix_clone/application/home/home_bloc.dart';
 import 'package:netflix_clone/core/colors/colors.dart';
-import 'package:netflix_clone/presentation/downloads/widgets/screen_downloads.dart';
 import 'package:netflix_clone/presentation/home/Screen_home.dart';
 import 'package:netflix_clone/presentation/main_page/widgets/bottom_nav.dart';
+import 'package:netflix_clone/presentation/main_page/widgets/tv_side_nav.dart';
 import 'package:netflix_clone/presentation/new_and_hot/screen_new_and_hot.dart';
 import 'package:netflix_clone/presentation/search/screen_search.dart';
+import 'package:netflix_clone/presentation/watch_party/screen_watch_party_lobby.dart';
+import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 
 class ScreenMainPage extends StatefulWidget {
   const ScreenMainPage({Key? key}) : super(key: key);
@@ -24,7 +25,10 @@ class _ScreenMainPageState extends State<ScreenMainPage> {
       key: PageStorageKey('search_tab_screen'),
       isEmbeddedTab: true,
     ),
-    ScreenDownloads(key: PageStorageKey('downloads_screen')),
+    ScreenWatchPartyLobby(
+      key: PageStorageKey('party_tab_screen'),
+      isEmbeddedTab: true,
+    ),
   ];
 
   @override
@@ -32,10 +36,6 @@ class _ScreenMainPageState extends State<ScreenMainPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final downloadsBloc = context.read<DownloadsBloc>();
-      if (downloadsBloc.state.downloads.isEmpty) {
-        downloadsBloc.add(const DownloadsEvent.getDownloadsImage());
-      }
       final homeBloc = context.read<HomeBloc>();
       if (homeBloc.state.trendingMovieList.isEmpty) {
         homeBloc.add(const GetHomeScreenData());
@@ -45,19 +45,35 @@ class _ScreenMainPageState extends State<ScreenMainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isTv = TvMode.isTv(context);
+
+    final pageBody = ValueListenableBuilder<int>(
+      valueListenable: indexChangeNotifier,
+      builder: (context, index, _) {
+        final safeIndex = index.clamp(0, _pages.length - 1);
+        return IndexedStack(
+          index: safeIndex,
+          children: _pages,
+        );
+      },
+    );
+
+    if (isTv) {
+      return Scaffold(
+        backgroundColor: backgrounndColor,
+        body: Row(
+          children: [
+            const TvSideNavigationRail(),
+            Expanded(child: pageBody),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: backgrounndColor,
       extendBody: true,
-      body: ValueListenableBuilder<int>(
-        valueListenable: indexChangeNotifier,
-        builder: (context, index, _) {
-          final safeIndex = index.clamp(0, _pages.length - 1);
-          return IndexedStack(
-            index: safeIndex,
-            children: _pages,
-          );
-        },
-      ),
+      body: pageBody,
       bottomNavigationBar: const BottomNaviagtionWidget(),
     );
   }

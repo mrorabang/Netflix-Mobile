@@ -9,24 +9,30 @@ class EpisodeItemModel {
   final String slug;
   final String filename;
   final String linkEmbed;
+  final String linkM3u8;
 
   EpisodeItemModel({
     required this.name,
     required this.slug,
     required this.filename,
     required this.linkEmbed,
+    this.linkM3u8 = '',
   });
 
+  String get streamUrl => linkM3u8.isNotEmpty ? linkM3u8 : linkEmbed;
+
   factory EpisodeItemModel.fromJson(Map<String, dynamic> json) {
+    final m3u8 = (json['link_m3u8'] as String? ?? '').trim();
     String link = (json['link_embed'] as String? ?? '').trim();
     if (link.isEmpty) {
-      link = (json['link_m3u8'] as String? ?? '').trim();
+      link = m3u8;
     }
     return EpisodeItemModel(
       name: (json['name'] as String? ?? 'Full').trim(),
       slug: (json['slug'] as String? ?? '').trim(),
       filename: (json['filename'] as String? ?? '').trim(),
       linkEmbed: link,
+      linkM3u8: m3u8,
     );
   }
 }

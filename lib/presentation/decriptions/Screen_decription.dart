@@ -5,6 +5,7 @@ import 'package:netflix_clone/core/colors/colors.dart';
 import 'package:netflix_clone/core/constants.dart';
 import 'package:netflix_clone/infrastructure/tmdb/tmdb_4k_service.dart';
 import 'package:netflix_clone/presentation/watch/screen_watch.dart';
+import 'package:netflix_clone/presentation/watch_party/screen_watch_party_lobby.dart';
 import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 import 'package:share_plus/share_plus.dart';
 import 'widget/movie_details.dart';
@@ -297,6 +298,26 @@ class _ScreenDescriptionState extends State<ScreenDescription> {
                             onTap: () {
                               Share.share(
                                 'Xem phim "${state.title}" chất lượng cao trên Nét Lích!',
+                              );
+                            },
+                          ),
+                          _buildActionIcon(
+                            icon: Icons.groups_rounded,
+                            label: "Xem Chung",
+                            onTap: () {
+                              final ep = state.episodeList.isNotEmpty
+                                  ? state.episodeList.first
+                                  : null;
+                              Navigator.push(
+                                context,
+                                netflixRoute(
+                                  ScreenWatchPartyLobby(
+                                    initialMovieId: widget.id,
+                                    initialMovieTitle: state.title,
+                                    initialPosterUrl: imageUrl,
+                                    initialStreamUrl: ep?.linkM3u8,
+                                  ),
+                                ),
                               );
                             },
                           ),
@@ -690,165 +711,468 @@ class _ScreenDescriptionState extends State<ScreenDescription> {
     required bool hasEpisodes,
     required bool isTrailerOnly,
   }) {
+    final tmdb4k = Tmdb4kService.getCached(widget.id);
+    final bgBannerUrl = tmdb4k?.backdrop4kUrl ?? imageUrl;
+    final leftPosterUrl = tmdb4k?.poster4kUrl ?? imageUrl;
+    final logoUrl = tmdb4k?.logoUrl;
+
+    final total = state.episodeList.length;
+    final chunkCount = total > 0 ? (total / _episodesPerChunk).ceil() : 1;
+    final safeChunk = _selectedChunk.clamp(0, chunkCount - 1);
+    final start = safeChunk * _episodesPerChunk;
+    final end = (start + _episodesPerChunk).clamp(0, total);
+    final visibleEpisodes =
+        total > 0 ? state.episodeList.sublist(start, end) : const [];
+
     return Scaffold(
       backgroundColor: backgrounndColor,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          state.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Lớp nền 1: Banner 4K UHD (3840x2160) phủ toàn bộ màn hình TV
+          Opacity(
+            opacity: 0.48,
+            child: SmoothNetworkImage(
+              imageUrl: bgBannerUrl,
+              cacheWidth: null,
+              filterQuality: FilterQuality.high,
+              alignment: Alignment.topCenter,
+            ),
           ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 210,
-              height: 315,
-              child: SmoothNetworkImage(
-                imageUrl: imageUrl,
-                cacheWidth: 500,
-                borderRadius: 12,
+          // Lớp phủ điện ảnh giúp nội dung sắc nét từ khoảng cách ngồi xem TV
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color(0xF208080D),
+                  Color(0xD90A0A10),
+                  Color(0x990A0A10),
+                ],
+                stops: [0.0, 0.55, 1.0],
               ),
             ),
-            const SizedBox(width: 28),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      state.title,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      children: [
-                        const RoundText(text: "16+"),
-                        RoundText(
-                            text: state.status.isEmpty ? "FHD" : state.status),
-                        if (state.voteAverage > 0)
-                          RoundText(
-                            text: "⭐ ${state.voteAverage.toStringAsFixed(1)}",
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      state.overview.isEmpty
-                          ? "Nội dung phim đang cập nhật..."
-                          : state.overview,
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: kGray,
-                        height: 1.45,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    if (hasEpisodes) ...[
-                      ElevatedButton.icon(
-                        autofocus: true,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x8008080D),
+                  Colors.transparent,
+                  backgrounndColor,
+                ],
+                stops: [0.0, 0.45, 1.0],
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(28, 14, 28, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Nút Quay lại hỗ trợ trỏ Remote D-Pad
+                  Row(
+                    children: [
+                      ScaleTap(
+                        showFocusRing: true,
+                        focusBorderRadius: 22,
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 28, vertical: 14),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                        icon: Icon(
-                          isTrailerOnly
-                              ? Icons.movie_creation_outlined
-                              : Icons.play_arrow_rounded,
-                          size: 26,
-                        ),
-                        label: Text(
-                          isTrailerOnly
-                              ? "Xem Trailer giới thiệu"
-                              : (state.episodeList.length > 1
-                                  ? "Phát tập 1 (${state.episodeList.first.name})"
-                                  : "Phát / Xem phim"),
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: () {
-                          final ep = state.episodeList.first;
-                          Navigator.push(
-                            context,
-                            netflixRoute(
-                              ScreenWatch(
-                                url: ep.linkEmbed,
-                                title: "${state.title} - ${ep.name}",
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      if (state.episodeList.length > 1) ...[
-                        const SizedBox(height: 18),
-                        const Text(
-                          "Danh sách tập phim",
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: state.episodeList.map((ep) {
-                            return ActionChip(
-                              backgroundColor: kCardColor,
-                              label: Text(
-                                ep.name,
-                                style: const TextStyle(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0x991C1C26),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0x33FFFFFF)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.arrow_back_rounded,
+                                  color: Colors.white, size: 18),
+                              SizedBox(width: 6),
+                              Text(
+                                "Quay lại",
+                                style: TextStyle(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  netflixRoute(
-                                    ScreenWatch(
-                                      url: ep.linkEmbed,
-                                      title: "${state.title} - ${ep.name}",
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Poster 2000x3000 Ultra-HD bên trái
+                        Container(
+                          width: 220,
+                          height: 330,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: const Color(0x38FFFFFF),
+                              width: 1,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0xB3000000),
+                                blurRadius: 20,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: SmoothNetworkImage(
+                            imageUrl: leftPosterUrl,
+                            cacheWidth: null,
+                            filterQuality: FilterQuality.high,
+                            borderRadius: 13,
+                          ),
+                        ),
+                        const SizedBox(width: 32),
+
+                        // Thông tin phim, nút điều khiển TV & Danh sách tập
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (logoUrl != null && logoUrl.isNotEmpty) ...[
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                        maxHeight: 62, maxWidth: 280),
+                                    child: Image.network(
+                                      logoUrl,
+                                      fit: BoxFit.contain,
+                                      alignment: Alignment.centerLeft,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox.shrink(),
                                     ),
                                   ),
-                                );
-                              },
-                            );
-                          }).toList(),
+                                  const SizedBox(height: 8),
+                                ],
+                                Text(
+                                  state.title,
+                                  style: TextStyle(
+                                    fontSize: logoUrl != null ? 20 : 28,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 6,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 3.5),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0x26FBBF24),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: const Color(0x99FBBF24),
+                                          width: 0.8,
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        "4K ULTRA HD",
+                                        style: TextStyle(
+                                          color: Color(0xFFFBBF24),
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ),
+                                    const RoundText(text: "16+"),
+                                    RoundText(
+                                      text: state.status.isEmpty
+                                          ? "FHD"
+                                          : state.status,
+                                    ),
+                                    if (state.voteAverage > 0)
+                                      RoundText(
+                                        text:
+                                            "⭐ ${state.voteAverage.toStringAsFixed(1)}",
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  state.overview.isEmpty
+                                      ? "Nội dung phim đang cập nhật..."
+                                      : state.overview,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14.5,
+                                    color: Color(0xFFC8C8D6),
+                                    height: 1.48,
+                                  ),
+                                ),
+                                const SizedBox(height: 18),
+                                if (hasEpisodes) ...[
+                                  Wrap(
+                                    spacing: 12,
+                                    runSpacing: 10,
+                                    children: [
+                                      ScaleTap(
+                                        autofocus: true,
+                                        showFocusRing: true,
+                                        focusBorderRadius: 10,
+                                        onTap: () {
+                                          final ep = state.episodeList.first;
+                                          Navigator.push(
+                                            context,
+                                            netflixRoute(
+                                              ScreenWatch(
+                                                url: ep.linkEmbed,
+                                                title:
+                                                    "${state.title} - ${ep.name}",
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 26, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                isTrailerOnly
+                                                    ? Icons
+                                                        .movie_creation_outlined
+                                                    : Icons.play_arrow_rounded,
+                                                size: 26,
+                                                color: Colors.black,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                isTrailerOnly
+                                                    ? "Xem Trailer giới thiệu"
+                                                    : (state.episodeList
+                                                                .length >
+                                                            1
+                                                        ? "Phát ngay • ${state.episodeList.first.name}"
+                                                        : "Phát phim ngay"),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      ValueListenableBuilder<Set<String>>(
+                                        valueListenable: MyListStore.savedIds,
+                                        builder: (context, savedSet, _) {
+                                          final saved =
+                                              savedSet.contains(widget.id);
+                                          return ScaleTap(
+                                            showFocusRing: true,
+                                            focusBorderRadius: 10,
+                                            enableHaptic: false,
+                                            onTap: () =>
+                                                MyListStore.toggleSaved(
+                                              context,
+                                              widget.id,
+                                              title: state.title,
+                                            ),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 12),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xCC262632),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
+                                                  color:
+                                                      const Color(0x38FFFFFF),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    saved
+                                                        ? Icons.check_rounded
+                                                        : Icons.add_rounded,
+                                                    color: Colors.white,
+                                                    size: 22,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    saved
+                                                        ? "Đã lưu"
+                                                        : "Danh sách",
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  if (state.episodeList.length > 1) ...[
+                                    const SizedBox(height: 22),
+                                    Text(
+                                      "Danh sách tập phim ($total)",
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    if (chunkCount > 1) ...[
+                                      const SizedBox(height: 10),
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children:
+                                              List.generate(chunkCount, (idx) {
+                                            final from =
+                                                idx * _episodesPerChunk + 1;
+                                            final to = ((idx + 1) *
+                                                    _episodesPerChunk)
+                                                .clamp(1, total);
+                                            final active = idx == safeChunk;
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 8),
+                                              child: ScaleTap(
+                                                showFocusRing: true,
+                                                focusBorderRadius: 20,
+                                                onTap: () => setState(
+                                                    () => _selectedChunk = idx),
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 14,
+                                                      vertical: 7),
+                                                  decoration: BoxDecoration(
+                                                    color: active
+                                                        ? kNetflixRed
+                                                        : kCardColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            18),
+                                                  ),
+                                                  child: Text(
+                                                    "Tập $from - $to",
+                                                    style: const TextStyle(
+                                                      fontSize: 12.5,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 12),
+                                    Wrap(
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children: visibleEpisodes.map((ep) {
+                                        return ScaleTap(
+                                          showFocusRing: true,
+                                          focusBorderRadius: 8,
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              netflixRoute(
+                                                ScreenWatch(
+                                                  url: ep.linkEmbed,
+                                                  title:
+                                                      "${state.title} - ${ep.name}",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 14, vertical: 9),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xD91E1E28),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                  color:
+                                                      const Color(0x26FFFFFF)),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons
+                                                      .play_circle_fill_rounded,
+                                                  size: 16,
+                                                  color: kNetflixRed,
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  ep.name,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 13.5,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ] else ...[
+                                  _buildUpdatingNotice(),
+                                ],
+                                const SizedBox(height: 28),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
-                    ] else ...[
-                      _buildUpdatingNotice(),
-                    ],
-                    const SizedBox(height: 24),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

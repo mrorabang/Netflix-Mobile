@@ -48,36 +48,40 @@ class _MainCardState extends State<MainCard> {
     final displayYear =
         rawYear.contains('-') ? rawYear.split('-').first : rawYear;
 
+    final isTv = TvMode.isTv(context);
+    final cardWidth = isTv ? 156.0 : 124.0;
+    final cardHeight = isTv ? 226.0 : 180.0;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
+      padding: EdgeInsets.symmetric(horizontal: isTv ? 7 : 5),
       child: ScaleTap(
         pressedScale: 0.94,
         onFocusChanged: (focused) => setState(() => _isFocused = focused),
         onTap: () => _openDetail(context),
         child: SizedBox(
-          width: 124,
+          width: cardWidth,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 160),
-                width: 124,
-                height: 180,
+                width: cardWidth,
+                height: cardHeight,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: _isFocused
                         ? Colors.white
                         : const Color(0x18FFFFFF),
-                    width: _isFocused ? 2.2 : 0.8,
+                    width: _isFocused ? 2.6 : 0.8,
                   ),
                   boxShadow: _isFocused
                       ? const [
                           BoxShadow(
-                            color: Color(0x99E50914),
-                            blurRadius: 12,
-                            spreadRadius: 1,
+                            color: Color(0xB3E50914),
+                            blurRadius: 16,
+                            spreadRadius: 2,
                           ),
                         ]
                       : const [
@@ -95,7 +99,7 @@ class _MainCardState extends State<MainCard> {
                     children: [
                       SmoothNetworkImage(
                         imageUrl: validImageUrl,
-                        cacheWidth: 650,
+                        cacheWidth: isTv ? 900 : 650,
                       ),
                       const DecoratedBox(
                         decoration: BoxDecoration(

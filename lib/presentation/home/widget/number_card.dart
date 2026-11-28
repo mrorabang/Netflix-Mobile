@@ -22,10 +22,17 @@ class NumberCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final validUrl = resolveImageUrl(imageUrl, null);
+    final isTv = TvMode.isTv(context);
+    final totalW = isTv ? 196.0 : 158.0;
+    final totalH = isTv ? 236.0 : 192.0;
+    final posterW = isTv ? 152.0 : 122.0;
+
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.only(right: isTv ? 12 : 8),
       child: ScaleTap(
         pressedScale: 0.94,
+        showFocusRing: true,
+        focusBorderRadius: 12,
         onTap: () {
           if (id.isNotEmpty) {
             Navigator.push(
@@ -35,8 +42,8 @@ class NumberCard extends StatelessWidget {
           }
         },
         child: SizedBox(
-          width: 158,
-          height: 192,
+          width: totalW,
+          height: totalH,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -45,7 +52,7 @@ class NumberCard extends StatelessWidget {
                 top: 0,
                 bottom: 8,
                 child: Container(
-                  width: 122,
+                  width: posterW,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
@@ -62,7 +69,7 @@ class NumberCard extends StatelessWidget {
                   ),
                   child: SmoothNetworkImage(
                     imageUrl: validUrl,
-                    cacheWidth: 650,
+                    cacheWidth: isTv ? 900 : 650,
                     borderRadius: 9,
                   ),
                 ),
@@ -76,10 +83,10 @@ class NumberCard extends StatelessWidget {
                     strokeColor: const Color(0xFFDADAE2),
                     child: Text(
                       "${index + 1}",
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: backgrounndColor,
                         fontWeight: FontWeight.w900,
-                        fontSize: 108,
+                        fontSize: isTv ? 126 : 108,
                         height: 1.0,
                         letterSpacing: -6,
                         decoration: TextDecoration.none,

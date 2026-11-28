@@ -244,28 +244,29 @@ class _ScreenHomeState extends State<ScreenHome> {
               ),
             ),
 
-            // Thanh Header Kính Mờ trượt mượt mà mà không gây relayout danh sách bên dưới
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: ValueListenableBuilder<bool>(
-                valueListenable: _showTopBar,
-                builder: (context, visible, child) {
-                  return AnimatedSlide(
-                    offset: visible ? Offset.zero : const Offset(0, -1.05),
-                    duration: const Duration(milliseconds: 260),
-                    curve: Curves.easeOutCubic,
-                    child: AnimatedOpacity(
-                      opacity: visible ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 220),
-                      child: child,
-                    ),
-                  );
-                },
-                child: _buildFloatingHeader(context),
+            // Thanh Header Kính Mờ chỉ hiển thị trên Điện thoại (trên TV đã có TvSideNavigationRail bên trái)
+            if (!TvMode.isTv(context))
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _showTopBar,
+                  builder: (context, visible, child) {
+                    return AnimatedSlide(
+                      offset: visible ? Offset.zero : const Offset(0, -1.05),
+                      duration: const Duration(milliseconds: 260),
+                      curve: Curves.easeOutCubic,
+                      child: AnimatedOpacity(
+                        opacity: visible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 220),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _buildFloatingHeader(context),
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -314,16 +315,20 @@ class _ScreenHomeState extends State<ScreenHome> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          "Nét Lích",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
+                        const Expanded(
+                          child: Text(
+                            "Nét Lích",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.3,
+                            ),
                           ),
                         ),
-                        const Spacer(),
+                        const SizedBox(width: 8),
                         ScaleTap(
                           onTap: () {
                             Navigator.push(
@@ -332,30 +337,30 @@ class _ScreenHomeState extends State<ScreenHome> {
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(7),
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: const Color(0x1FFFFFFF),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Icon(
                               CupertinoIcons.search,
-                              size: 20,
+                              size: 18,
                               color: Colors.white,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 6),
                         ScaleTap(
                           onTap: () => showCastBottomSheet(context),
                           child: Container(
-                            padding: const EdgeInsets.all(7),
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: const Color(0x1FFFFFFF),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Icon(
                               Icons.cast_rounded,
-                              size: 20,
+                              size: 18,
                               color: Colors.white,
                             ),
                           ),

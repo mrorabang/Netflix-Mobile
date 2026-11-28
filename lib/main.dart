@@ -16,6 +16,7 @@ import 'application/search/search_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await TvMode.init();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -25,12 +26,19 @@ Future<void> main() async {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  if (TvMode.isNativeAndroidTv) {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  } else {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
   await configureInjection();
   runApp(const MyApp());
 }
@@ -54,6 +62,17 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Nét Lích',
         scrollBehavior: const NetflixScrollBehavior(),
+        shortcuts: <ShortcutActivator, Intent>{
+          ...WidgetsApp.defaultShortcuts,
+          const SingleActivator(LogicalKeyboardKey.select):
+              const ActivateIntent(),
+          const SingleActivator(LogicalKeyboardKey.enter):
+              const ActivateIntent(),
+          const SingleActivator(LogicalKeyboardKey.numpadEnter):
+              const ActivateIntent(),
+          const SingleActivator(LogicalKeyboardKey.gameButtonA):
+              const ActivateIntent(),
+        },
         theme: ThemeData(
           brightness: Brightness.dark,
           scaffoldBackgroundColor: backgrounndColor,

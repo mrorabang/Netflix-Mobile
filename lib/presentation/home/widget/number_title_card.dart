@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/presentation/home/widget/number_card.dart';
 import 'package:netflix_clone/presentation/widget/main_title.dart';
+import 'package:netflix_clone/presentation/widgets/smooth_ui.dart';
 
 class NumberTitleCard extends StatelessWidget {
   const NumberTitleCard({
@@ -20,20 +21,21 @@ class NumberTitleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final count = posterList.length > 10 ? 10 : posterList.length;
     if (count == 0) return const SizedBox.shrink();
+    final isTv = TvMode.isTv(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
+          padding: EdgeInsets.symmetric(horizontal: isTv ? 24 : 14),
           child: MainTitle(title: title),
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 196,
+          height: isTv ? 242 : 196,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
+            padding: EdgeInsets.symmetric(horizontal: isTv ? 24 : 14),
             itemCount: count,
             itemBuilder: (context, index) {
               final movieId =

@@ -191,6 +191,65 @@ class _ScreenSearchState extends State<ScreenSearch> {
                     ),
                   ],
                 ),
+                if (TvMode.isTv(context)) ...[
+                  const SizedBox(height: 10),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Gợi ý nhanh TV:  ",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: kGray,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        for (final kw in const [
+                          'Hành Động',
+                          'Hàn Quốc',
+                          'Cổ Trang',
+                          'Kinh Dị',
+                          'Hoạt Hình',
+                          'Âu Mỹ',
+                          'Việt Nam',
+                        ])
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ScaleTap(
+                              showFocusRing: true,
+                              focusBorderRadius: 16,
+                              onTap: () {
+                                _searchController.text = kw;
+                                context
+                                    .read<SearchBloc>()
+                                    .add(SerachMovie(movieQuery: kw));
+                                setState(() {});
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 11, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: kCardColor,
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                      color: const Color(0x26FFFFFF)),
+                                ),
+                                child: Text(
+                                  kw,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -358,6 +417,8 @@ class _ScreenSearchState extends State<ScreenSearch> {
   }) {
     return ScaleTap(
       pressedScale: 0.94,
+      showFocusRing: true,
+      focusBorderRadius: 20,
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),

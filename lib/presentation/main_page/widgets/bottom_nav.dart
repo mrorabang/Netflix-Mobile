@@ -35,9 +35,9 @@ const List<_NavItemSpec> _navItems = [
     label: 'Tìm kiếm',
   ),
   _NavItemSpec(
-    icon: Icons.download_outlined,
-    activeIcon: Icons.download_rounded,
-    label: 'Tải xuống',
+    icon: Icons.groups_outlined,
+    activeIcon: Icons.groups_rounded,
+    label: 'Party',
   ),
 ];
 

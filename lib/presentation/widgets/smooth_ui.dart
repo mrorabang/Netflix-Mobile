@@ -19,6 +19,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:netflix_clone/core/constants.dart';
 
+/// Nhận diện thiết bị Android TV thực thụ (qua `UiModeManager` / `FEATURE_LEANBACK`)
+/// hoặc màn hình lớn ngang (TV / Monitor >= 900dp) để tự động chuyển sang giao diện 10-foot TV 4K.
+class TvMode {
+  static const MethodChannel _channel =
+      MethodChannel('com.example.netflix_clone/cast');
+
+  static bool isNativeAndroidTv = false;
+
+  static Future<void> init() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('isAndroidTv');
+      isNativeAndroidTv = res ?? false;
+    } catch (_) {
+      isNativeAndroidTv = false;
+    }
+  }
+
+  /// Trả về `true` khi chạy trên Android TV hoặc màn hình ngang lớn (TV / Box / Desktop).
+  static bool isTv(BuildContext context) {
+    if (isNativeAndroidTv) return true;
+    final size = MediaQuery.of(context).size;
+    return size.width >= 900 && size.width > size.height;
+  }
+}
+
 /// Hành vi cuộn toàn cục: áp dụng hiệu ứng cuộn đàn hồi mượt mà cho cả danh sách dọc và ngang,
 /// đồng thời cho phép kéo bằng cảm ứng hoặc chuột trên mọi nền tảng.
 class NetflixScrollBehavior extends MaterialScrollBehavior {
@@ -145,12 +170,15 @@ class MyListStore {
   }
 }
 
-/// Widget bọc tương tác chạm đàn hồi (Scale-down khi chạm tay + Scale-up khi focus TV).
+/// Widget bọc tương tác chạm đàn hồi (Scale-down khi chạm tay + Scale-up & tự cuộn mượt khi focus Remote TV).
 class ScaleTap extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
   final double pressedScale;
   final bool enableHaptic;
+  final bool autofocus;
+  final bool showFocusRing;
+  final double focusBorderRadius;
   final ValueChanged<bool>? onFocusChanged;
 
   const ScaleTap({
@@ -159,6 +187,9 @@ class ScaleTap extends StatefulWidget {
     this.onTap,
     this.pressedScale = 0.95,
     this.enableHaptic = true,
+    this.autofocus = false,
+    this.showFocusRing = false,
+    this.focusBorderRadius = 10,
     this.onFocusChanged,
   });
 
@@ -172,10 +203,27 @@ class _ScaleTapState extends State<ScaleTap> {
 
   void _triggerTap() {
     if (widget.onTap == null) return;
-    if (widget.enableHaptic) {
+    if (widget.enableHaptic && !TvMode.isNativeAndroidTv) {
       HapticFeedback.selectionClick();
     }
     widget.onTap!();
+  }
+
+  void _handleFocusChange(bool focused) {
+    setState(() => _isFocused = focused);
+    widget.onFocusChanged?.call(focused);
+    // Tự động cuộn mượt để phần tử đang được trỏ bởi Remote TV luôn nằm rõ trong khung nhìn
+    if (focused && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Scrollable.ensureVisible(
+          context,
+          alignment: 0.35,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+        );
+      });
+    }
   }
 
   @override
@@ -183,15 +231,39 @@ class _ScaleTapState extends State<ScaleTap> {
     final targetScale =
         _isPressed ? widget.pressedScale : (_isFocused ? 1.05 : 1.0);
 
+    Widget content = widget.child;
+    if (widget.showFocusRing) {
+      content = AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(widget.focusBorderRadius),
+          border: Border.all(
+            color: _isFocused ? Colors.white : Colors.transparent,
+            width: _isFocused ? 2.2 : 0.0,
+          ),
+          boxShadow: _isFocused
+              ? const [
+                  BoxShadow(
+                    color: Color(0x99E50914),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
+        ),
+        child: content,
+      );
+    }
+
     return Focus(
-      onFocusChange: (focused) {
-        setState(() => _isFocused = focused);
-        widget.onFocusChanged?.call(focused);
-      },
+      autofocus: widget.autofocus,
+      onFocusChange: _handleFocusChange,
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent &&
             (event.logicalKey == LogicalKeyboardKey.select ||
                 event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+                event.logicalKey == LogicalKeyboardKey.gameButtonA ||
                 event.logicalKey == LogicalKeyboardKey.space)) {
           _triggerTap();
           return KeyEventResult.handled;
@@ -214,7 +286,7 @@ class _ScaleTapState extends State<ScaleTap> {
           scale: targetScale,
           duration: const Duration(milliseconds: 130),
           curve: Curves.easeOutCubic,
-          child: widget.child,
+          child: content,
         ),
       ),
     );
